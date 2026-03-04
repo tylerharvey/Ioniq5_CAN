@@ -1,0 +1,3 @@
+At the moment, this repository contains two logs of CAN messages filtered/edited down from logs recorded using SavvyCAN that can be sent back to Ioniq 5s with a battery PTC heater equipped and battery preconditioning mode enabled to initiate or cancel preconditioning manually. These messages were reverse-engineered by [dragz](https://github.com/dragz) and I. See dragz's [articles](https://github.com/dragz/explorationsincarhacking/tree/main/articles) or our [Ioniqforum notes](https://www.ioniqforum.com/posts/666540/) for more documentation. 
+
+I expect that we'll both make a lot more documentation available soon. 
