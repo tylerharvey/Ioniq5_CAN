@@ -1,0 +1,22 @@
+Id	Description	Qty	Unit	Designators	Manufacturer	MPN	Supplier	SPN
+1	5.08mm pitch wire-to-board receptacle, DYNAMIC D-3500 REC HSG 2P	2		switch	TE Connectivity	175362-2		
+2	Cable, copper, TXL insulated, 1 x 0.3 mm²	0.05	m	W1_b				
+3	Cable, copper, TXL insulated, 13 x 0.3 mm²	0.15	m	W3_b				
+4	Cable, copper, TXL insulated, 2 x 0.3 mm²	0.25	m	W2_d, W2_e, W2_f, W2_g, W2_h				
+5	Cable, copper, TXL insulated, 2 x 1.25 mm²	0.05	m	W1_a				
+6	Cable, copper, TXL insulated, 3 x 0.3 mm²	0.3	m	W2_a				
+7	Cable, copper, TXL insulated, 4 x 1.25 mm²	0.15	m	W3_a				
+8	Cable, copper, TXL insulated, twisted pair, 2 x 0.3 mm²	0.75	m	W2_b_twisted, W2_c_twisted, W3_c_twisted				
+9	Connector, AMP_020060_35F, female, 35 pins	1		AVN_M05-B_F	TE Connectivity	2188701		
+10	Connector, OBD2, female, 16 pins	1		OBD2	Molex	51115-1611		
+11	Connector, Splice, 1 pins	8		S11, S13, S33, SGND, SMH1, SMH2, SML1, SML2				
+12	Connector, double pole single throw, latching 5VDC, 6 pins	1		switch	Alcoswitch	TSS21KGPC	TE Connectivity	1-1437579-6
+13	Connector, wire-to-wire equiv. of TE 2188692, male, 35 pins	1		AVN_M05-B_MALE_MATE				
+14	Crimp, 0.2-0.6mm^2 receptable contact	4		switch	TE Connectivity	175195-2		
+15	Crimp, 020 Terminal	22		AVN_M05-B_F, AVN_M05-B_MALE_MATE	TE Connectivity	2219299-1		
+16	Crimp, 060 Terminal, 0.3mm^2 wire	8		AVN_M05-B_F, AVN_M05-B_MALE_MATE	TE Connectivity	2109006-1		
+17	Crimp, 060 Terminal, 1.25mm^2 wire	8		AVN_M05-B_F, AVN_M05-B_MALE_MATE	TE Connectivity	2109006-3		
+18	Crimp, OBD2 Terminal	7		OBD2	Molex	50420-8000		
+19	Retainer, OBD2 Retainer	7		OBD2	Molex	51117-1605		
+20	Sleeve, Braided PET, black heat shrink, 20mm	0.15	m	W3_b				
+21	Sleeve, Braided PET, black heat shrink, 3:1 30mm	0.3	m	W2_a				
