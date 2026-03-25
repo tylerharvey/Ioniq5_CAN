@@ -1,0 +1,25 @@
+Id	Description	Qty	Unit	Designators	Manufacturer	MPN	Supplier
+1	Cable, copper, TXL insulated, 1 x 0.3 mm²	0.05	m	W1_b			
+2	Cable, copper, TXL insulated, 13 x 0.3 mm²	0.15	m	W3_b			
+3	Cable, copper, TXL insulated, 2 x 0.3 mm²	0.25	m	W2_d, W2_e, W2_f, W2_g, W2_h			
+4	Cable, copper, TXL insulated, 2 x 1.25 mm²	0.05	m	W1_a			
+5	Cable, copper, TXL insulated, 3 x 0.3 mm²	0.3	m	W2_a			
+6	Cable, copper, TXL insulated, 4 x 1.25 mm²	0.15	m	W3_a			
+7	Cable, copper, TXL insulated, twisted pair, 2 x 0.3 mm²	0.75	m	W2_b_twisted, W2_c_twisted, W3_c_twisted			
+8	Connector, 2-pin, male, 3 pins	1		shunt_male	AMP	174928-1	TE Connectivity
+9	Connector, 3-pin, female, 3 pins	1		shunt_female	AMP	174921-1	TE Connectivity
+10	Connector, AMP_020060_35F, female, 35 pins	1		AVN_M05-B_F	TE Connectivity	2188701	
+11	Connector, OBD2, female, 16 pins	1		OBD2	Molex	51115-1611	
+12	Connector, Splice, 1 pins	8		S11, S13, S33, SGND, SMH1, SMH2, SML1, SML2			
+13	Connector, wire-to-wire equiv. of TE 2188692, male, 35 pins	1		AVN_M05-B_MALE_MATE			
+14	Crimp, 0.2-0.35mm^2 receptacle contact	3		shunt_female	TE Connectivity	173630-1	
+15	Crimp, 0.2-0.35mm^2 receptacle contact	3		shunt_male	TE Connectivity	17633-1	
+16	Crimp, 020 Terminal	11		AVN_M05-B_MALE_MATE	TE Connectivity	2219299-1	
+17	Crimp, 020 Terminal	11		AVN_M05-B_F	TE Connectivity	2219299-1 MALE MATE	
+18	Crimp, 060 Terminal, 0.3mm^2 wire	4		AVN_M05-B_MALE_MATE	TE Connectivity	2109006-1	
+19	Crimp, 060 Terminal, 0.3mm^2 wire	4		AVN_M05-B_F	TE Connectivity	2109006-1 MALE MATE	
+20	Crimp, 060 Terminal, 1.25mm^2 wire	4		AVN_M05-B_MALE_MATE	TE Connectivity	2109006-3	
+21	Crimp, 060 Terminal, 1.25mm^2 wire	4		AVN_M05-B_F	TE Connectivity	2109006-3 MALE MATE	
+22	Crimp, OBD2 Terminal	7		OBD2	Molex	50420-8000	
+23	Retainer, OBD2 Retainer	7		OBD2	Molex	51117-1605	
+24	Sleeve, Tesa 3/4" tape (IB151608)	0.45	m	W2_a, W3_b			

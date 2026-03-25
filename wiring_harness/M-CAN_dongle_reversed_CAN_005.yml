@@ -1,3 +1,6 @@
+# metadata:
+  # name: Hyundai/Kia M-CAN to OBD dongle
+
 connectors:
   AVN_M05-B_F:
     type: AMP_020060_35F
@@ -6,8 +9,8 @@ connectors:
     manufacturer: TE Connectivity
     mpn: 2188701
     image: 
-      src: ../connector_imgs/M05-B_rear.png
-      caption: view from rear of female connector
+      src: ./connector_imgs/M05-B_rear.png
+      caption: view from <b>rear</b> (wire-in side) of female connector
     additional_components:
       - type: Crimp
         subtype: 020 Terminal
@@ -34,27 +37,27 @@ connectors:
         subtype: 020 Terminal
         qty: 11
         manufacturer: TE Connectivity
-        mpn: 2219299-1 
+        mpn: 2219299-1 MALE MATE
       - type: Crimp
         subtype: 060 Terminal, 0.3mm^2 wire
         qty: 4
         manufacturer: TE Connectivity
-        mpn: 2109006-1 
+        mpn: 2109006-1 MALE MATE
       - type: Crimp
         subtype: 060 Terminal, 1.25mm^2 wire
         qty: 4
         manufacturer: TE Connectivity
-        mpn: 2109006-3 
+        mpn: 2109006-3  MALE MATE
 
   OBD2:
     type: OBD2
     subtype: female
-    pinlabels: [PWR_12V_7, NC, M-CAN_(HIGH)_1, NC, GND, NC, NC, NC, PWR_12V_1, NC, M-CAN_(LOW)_1, M-CAN_(LOW)_2, M-CAN_(HIGH)_2, NC, NC, NC]
+    pinlabels: [PWR_12V_7, NC, M-CAN_(HIGH)_2, GND, GND, NC, NC, NC, PWR_12V_1, NC, M-CAN_(LOW)_2, M-CAN_(LOW)_1, M-CAN_(HIGH)_1, NC, NC, NC]
     manufacturer: Molex
     mpn: 51115-1611
     image: 
-      src: ../connector_imgs/OBD_rear.png
-      caption: view from rear of female connector
+      src: ./connector_imgs/OBD_rear.png
+      caption: view from <b>rear</b> (wire-in side) of female connector
     additional_components:
       - type: Crimp
         subtype: OBD2 Terminal
@@ -74,9 +77,9 @@ connectors:
     mpn: TSS21KGPC
     supplier: TE Connectivity
     spn: 1-1437579-6
-    pinlabels: [M-CAN_(HIGH)_1, M-CAN_(LOW)_1, M-CAN_(HIGH)_2, M-CAN_(LOW)_2]
+    pinlabels: [M-CAN_(HIGH)_1, NC, M-CAN_(HIGH)_2, M-CAN_(LOW)_1, NC, M-CAN_(LOW)_2]
     image:
-      src: ../connector_imgs/SPDT_switch.png
+      src: ./connector_imgs/SPDT_switch.png
       caption: HIGH 1-HIGH 2 and LOW 1-LOW 2
     additional_components:
       - type: 5.08mm pitch wire-to-board receptacle
@@ -133,6 +136,10 @@ connectors:
     type: Splice
     pinlabels: [M-CAN_(LOW)_2]
 
+  SGND:
+    type: Splice
+    pinlabels: [GND]
+
 tweak:
   override:
     S7:
@@ -147,122 +154,177 @@ tweak:
     }
 
 cables:
-  W1:
+  W3_b:
     type: copper, TXL insulated
     gauge: 0.3 mm2
     length: 0.15
-    colors: [BGRD, BNRD, WHRD, GYOG, BGBK, BNBK, WHBK, GYLB, OG, GNOG, YEOG, PK, RD, BKBG, BK]
-    wirecount: 15
+    colors: [BGRD, BNRD, WHRD, BGBK, BNBK, WHBK, OG, GNOG, YEOG, PK, RD, BKBG, BK]
+    wirecount: 13
     shield: false
     additional_components:
       - type: Sleeve
-        subtype: Braided PET, black heat shrink, 20mm
+        subtype: Tesa 3/4" tape (IB151608)
         qty_multiplier: length
         unit: m
-  W2:
+
+  W3_a:
     type: copper, TXL insulated
     gauge: 1.25 mm2
     length: 0.15
     colors: [VT, BU, BKBN, BK]
     wirecount: 4
     shield: false
-  W3:
+
+  W3_c_twisted: 
+    type: copper, TXL insulated, twisted pair
+    gauge: 0.3 mm2
+    length: 0.15
+    colors: [GYOG, GYLB]
+    wirecount: 2
+    shield: false
+
+  W2_a:
     type: copper, TXL insulated
     gauge: 0.3 mm2
     length: 0.3
-    colors: [LB, GYPK, BK, GYRD, GYBU, GYOG, GYLB]
-    wirecount: 7
+    colors: [LB, GYPK, BK]
+    wirecount: 3
     shield: false
     additional_components:
       - type: Sleeve
-        subtype: Braided PET, black heat shrink, 3:1 30mm
+        subtype: Tesa 3/4" tape (IB151608)
         qty_multiplier: length
         unit: m
-  W4:
+
+  W2_b_twisted: 
+    type: copper, TXL insulated, twisted pair
+    gauge: 0.3 mm2
+    length: 0.3
+    colors: [GYRD, GYBU]
+    wirecount: 2
+    shield: false
+  W2_c_twisted: 
+    type: copper, TXL insulated, twisted pair
+    gauge: 0.3 mm2
+    length: 0.3
+    colors: [GYOG, GYLB]
+    wirecount: 2
+    shield: false
+
+  W2_d:
     type: copper, TXL insulated
     gauge: 0.3 mm2
     length: 0.05
-    colors: [GYRD, GYBU, GYOG, GYLB]
-    wirecount: 4
+    colors: [GYRD, GYBU]
+    wirecount: 2
     shield: false
-  W6:
+  W2_e:
+    type: copper, TXL insulated
+    gauge: 0.3 mm2
+    length: 0.05
+    colors: [GYOG, GYLB]
+    wirecount: 2
+    shield: false
+  W2_h:
+    type: copper, TXL insulated
+    gauge: 0.3 mm2
+    length: 0.05
+    colors: [BK, BK]
+    wirecount: 2
+    shield: false
+  
+  W1_a:
     type: copper, TXL insulated
     gauge: 1.25 mm2
     length: 0.05
     colors: [BU, BK]
     wirecount: 2
     shield: false
-  W7:
+  W1_b:
     type: copper, TXL insulated
     gauge: 0.3 mm2
     length: 0.05
     colors: [GYPK]
     wirecount: 1
     shield: false
-  W5:
+  W2_f:
     type: copper, TXL insulated
     gauge: 0.3 mm2
     length: 0.05
-    colors: [GYRD, GYBU, GYOG, GYLB]
-    wirecount: 4
+    colors: [GYRD, GYBU]
+    wirecount: 2
+    shield: false
+  W2_g:
+    type: copper, TXL insulated
+    gauge: 0.3 mm2
+    length: 0.05
+    colors: [GYOG, GYLB]
+    wirecount: 2
     shield: false
 
 connections:
-  -
-    - AVN_M05-B_F: [1, 2, 6, 14, 15, 19, 22, 23, 24, 32, 34, 35]
-    - W1: [1-3, 5-7, 9-12, 14-15]
-    - AVN_M05-B_MALE_MATE: [1, 2, 6, 14, 15, 19, 22, 23, 24, 32, 34, 35]
-  -
-    - AVN_M05-B_F: [11, 13]
-    - W6: [1,2]
-    - [S11, S13]
-    - W3: [1, 3]
-  -
-    - AVN_M05-B_F: [33]
-    - W7: [1]
-    - [S33]
-    - W3: [2]
-  -
-    - W3: [1,2,3]
-    - OBD2: [9, 1, 5]
-  -
-    - AVN_M05-B_F: [10,12]
-    - W2: [1, 3]
-    - AVN_M05-B_MALE_MATE: [10, 12]
-  -
-    - [S11, S13]
-    - W2: [2, 4]
-    - AVN_M05-B_MALE_MATE: [11, 13]
-  -
-    - [S33]
-    - W1: [13]
-    - AVN_M05-B_MALE_MATE: [33]
   - 
     - [S7, S20]
-    - W1: [4, 8]
+    - W3_c_twisted: [1, 2]
     - AVN_M05-B_MALE_MATE: [7, 20]
   - 
     - [S7, S20]
-    - W3: [6, 7]
+    - W2_c_twisted: [1, 2]
     - [SMH2, SML2]
-    - W5: [3,4]
-    - switch: [3, 4] 
+    - W2_g: [1,2]
+    - switch: [3, 6] 
+  -
+    - AVN_M05-B_F: [1, 2, 6, 14, 15, 19, 22, 23, 24, 32, 34, 35]
+    - W3_b: [1-10, 12-13]
+    - AVN_M05-B_MALE_MATE: [1, 2, 6, 14, 15, 19, 22, 23, 24, 32, 34, 35]
+  -
+    - AVN_M05-B_F: [11, 13]
+    - W1_a: [1,2]
+    - [S11, S13]
+    - W2_a: [1, 3]
+  -
+    - AVN_M05-B_F: [33]
+    - W1_b: [1]
+    - [S33]
+    - W2_a: [2]
+  -
+    - W2_a: [1,2]
+    - OBD2: [9, 1]
+  -
+    - AVN_M05-B_F: [10,12]
+    - W3_a: [1, 3]
+    - AVN_M05-B_MALE_MATE: [10, 12]
+  -
+    - [S11, S13]
+    - W3_a: [2, 4]
+    - AVN_M05-B_MALE_MATE: [11, 13]
+  -
+    - [S33]
+    - W3_b: [11]
+    - AVN_M05-B_MALE_MATE: [33]
   -
     - AVN_M05-B_F: [7, 20] 
-    - W3: [4, 5]
+    - W2_b_twisted: [1, 2]
     - [SMH1, SML1]
-    - W5: [1,2]
-    - switch: [1, 2] 
+    - W2_f: [1,2]
+    - switch: [1, 4] 
 #  -
 #    - AVN_M05-B_MALE_MATE: [7, 20] 
-#    - W3: [6, 7]
+#    - W2_a: [6, 7]
 #    - switch: [3, 4] 
   -
-    - [SMH1, SML1, SMH2, SML2]
-    - W4: [1-4]
-    - OBD2: [3, 11, 13, 12]
-#   -
-    # - SGND: [1, 1]
-    # - W4: [1,2]
-    # - OBD2: [4,5]
-  
+    - [SMH1, SML1]
+    - W2_d: [1-2]
+    - OBD2: [13, 12]
+  -
+    - [SMH2, SML2]
+    - W2_e: [1-2]
+    - OBD2: [3, 11]
+  -
+    - W2_a: [3]
+    - SGND: [1]
+  -
+    - SGND: [1, 1]
+    - W2_h: [1,2]
+    - OBD2: [4,5]
+ 
