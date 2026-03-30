@@ -1,0 +1,32 @@
+Id	Description	Qty	Unit	Designators	Manufacturer	MPN	Supplier
+1	Cable, copper, TXL insulated, 1 x 0.3 mm²	0.15	m	W1_b, W2_i			
+2	Cable, copper, TXL insulated, 13 x 0.3 mm²	0.15	m	W3_b			
+3	Cable, copper, TXL insulated, 2 x 0.3 mm²	0.27	m	W2_d, W2_e, W2_f, W2_g, W2_h, W4_a, W4_b			
+4	Cable, copper, TXL insulated, 2 x 1.25 mm²	0.05	m	W1_a			
+5	Cable, copper, TXL insulated, 3 x 0.3 mm²	0.3	m	W2_a			
+6	Cable, copper, TXL insulated, 4 x 1.25 mm²	0.15	m	W3_a			
+7	Cable, copper, TXL insulated, twisted pair, 2 x 0.3 mm²	0.75	m	W2_b_twisted, W2_c_twisted, W3_c_twisted			
+8	Connector, 2-pin, male, 3 pins	2		shunt_cap_male, shunt_male	AMP	174928-1	TE Connectivity
+9	Connector, 3-pin, female, 3 pins	2		shunt_cap_female, shunt_female	AMP	174921-1	TE Connectivity
+10	Connector, AMP_020060_35F, female, 35 pins	1		AVN_M05-B_F	TE Connectivity	2188701	
+11	Connector, OBD2, female, 16 pins	1		OBD2	Molex	51115-1611	
+12	Connector, Splice, 1 pins	8		S11, S13, S33, SGND, SMH1, SMH2, SML1, SML2			
+13	Connector, resistor, 1/4W 120R, 2 pins	2		cap_resistor_1, cap_resistor_2			
+14	Connector, wire-to-wire equiv. of TE 2188692, male, 35 pins	1		AVN_M05-B_MALE_MATE			
+15	Crimp, 0.2-0.35mm^2 receptacle contact	6		shunt_cap_female, shunt_female	TE Connectivity	173630-1	
+16	Crimp, 0.2-0.35mm^2 receptacle contact	6		shunt_cap_male, shunt_male	TE Connectivity	17633-1	
+17	Crimp, 020 Terminal	11		AVN_M05-B_MALE_MATE	TE Connectivity	2219299-1	
+18	Crimp, 020 Terminal	11		AVN_M05-B_F	TE Connectivity	2219299-1 MALE MATE	
+19	Crimp, 060 Terminal, 0.3mm^2 wire	4		AVN_M05-B_MALE_MATE	TE Connectivity	2109006-1	
+20	Crimp, 060 Terminal, 0.3mm^2 wire	4		AVN_M05-B_F	TE Connectivity	2109006-1 MALE MATE	
+21	Crimp, 060 Terminal, 1.25mm^2 wire	4		AVN_M05-B_MALE_MATE	TE Connectivity	2109006-3	
+22	Crimp, 060 Terminal, 1.25mm^2 wire	4		AVN_M05-B_F	TE Connectivity	2109006-3 MALE MATE	
+23	Crimp, OBD2 Terminal	7		OBD2	Molex	50420-8000	
+24	Retainer, OBD2 Retainer	7		OBD2	Molex	51117-1605	
+25	Sleeve, Tesa 3/4" tape (IB151608)	0.45	m	W2_a, W3_b			
+26	ferrule	4		cap_resistor_1, cap_resistor_2			
+27	heat shrink tube, 4.8 mm diameter, 3:1	0.06	m	cap_resistor_1, cap_resistor_2			
+28	heat-shrink label, A1	1		W2_f			
+29	heat-shrink label, A2	1		W4_a			
+30	heat-shrink label, B1	1		W2_g			
+31	heat-shrink label, B2	1		W4_b			
