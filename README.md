@@ -17,18 +17,23 @@ This project has a few moving parts:
 
 We have alpha (DIY) prototype versions or better of all of the above on several platforms.
 
+Videos of the button in action:
+- [dragz triggering preconditioning from a laptop](https://youtu.be/vaBQV_6DW-M?si=8POdBs7m_WmN-vUu)
+- [me triggering preconditioning with star button using Liz's firmware](https://youtu.be/1I849mg2cQ4?si=igR4gxgVAqW1klbn)
+
 # Current Status
 1. CAN messages:
    - The necessary CAN messages to initiate preconditioning on 2021-2024 E-GMP cars were isolated by dragz and I in early March 2026. 
 2. microcontroller: 
    - We have a line on a cheap prepackaged microcontroller. If you follow the breadcrumbs, it's fairly easy to work out what we plan to use. But since there are a limited quantity remaining, I'll avoid clearly stating what it is.
 3. firmware:
-   - So far, Liz and I have worked on firmware for the microcontroller [here](https://github.com/tylerharvey/animatronic_panda). Liz wrote a draft of the necessary firmware and I am testing it now.
+   - So far, Liz and I have worked on firmware for the microcontroller [here](https://github.com/tylerharvey/animatronic_panda). I am very excited to say that [Liz's firmware works!](https://youtu.be/1I849mg2cQ4?si=igR4gxgVAqW1klbn)
+
 4. wiring harness: 
    - I am in discussions with about 5 vendors on harness assembly. I have samples made from one, shipping to me shortly. 
    - ![samples](./wiring_harness/first_samples.png)
 5. user interface:
-   - As a first user interface, Liz wrote the firmware to activate preconditioning on star button press. We are actively weighing other interface options (WiFi, USB buttons, etc.).
+   - As a first user interface, Liz wrote the firmware to [activate and deactivate](https://youtu.be/3RfnEo8Xc0o?si=r9ix7-klKYVObkZd) preconditioning on star button press. We are actively weighing other interface options (WiFi, USB buttons, etc.).
 
 # Contents
 At the moment, this repository contains:
