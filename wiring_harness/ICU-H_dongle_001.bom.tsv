@@ -1,0 +1,26 @@
+Id	Description	Qty	Unit	Designators	Manufacturer	MPN
+1	Cable, copper, TXL insulated, 1 x 0.3 mm²	0.3	m	W2_GND		
+2	Cable, copper, TXL insulated, 1 x 1.25 mm²	0.1	m	W4_PWR		
+3	Cable, copper, TXL insulated, 18 x 0.3 mm²	0.05	m	W1		
+4	Cable, copper, TXL insulated, 2 x 0.3 mm²	0.01	m	W2_GND2		
+5	Cable, copper, TXL insulated, twisted pair, 2 x 0.3 mm²	1.2	m	W2_B_twisted, W2_C_twisted, W2_E_twisted, W2_G_twisted, W2_I_twisted, W2_M_twisted, W2_P_twisted, W3_twisted		
+6	Connector, 3-pin, female, 3 pins	1		CAN_selector	Star	ST1803-0.7-21
+7	Connector, 3-pin, male, 3 pins	7			Star	ST1803-0.7-11
+8	Connector, 32-pin, female, 32 pins	1		ST1532_0p7_21TD	Star	ST1532-0.7-21TD
+9	Connector, 32-pin, male, 32 pins	1		ST1532_0p7_11TD	Star	ST1532-0.7-11TD
+10	Connector, OBD2, female, 16 pins	1		OBD2	Molex	51115-1611
+11	Connector, Splice, 1 pins	1		SGND		
+12	Connector, fuse tap, micro2, 1 pins	1		Fuse_tap	Star	ST304 Micro 2
+13	Crimp	52		CAN_selector, ST1532_0p7_11TD, ST1532_0p7_21TD		
+14	Crimp, OBD2 Terminal	7		OBD2	Molex	50420-8000
+15	Retainer, OBD2 Retainer	7		OBD2	Molex	51117-1605
+16	Sleeve, Tesa 3/4" tape (IB151608)	0.35	m	W1, W2_GND		
+17	heat-shrink label, B-CAN	1		W2_B_twisted		
+18	heat-shrink label, C-CAN	1		W2_C_twisted		
+19	heat-shrink label, E-CAN	1		W2_E_twisted		
+20	heat-shrink label, G-CAN	1		W2_G_twisted		
+21	heat-shrink label, I-CAN	1		W2_I_twisted		
+22	heat-shrink label, M-CAN	1		W2_M_twisted		
+23	heat-shrink label, P-CAN	1		W2_P_twisted		
+24	heat-shrink label, SELECT BUS	1		W3_twisted		
+25	micro2 fuse, 10A	1		Fuse_tap		
