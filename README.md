@@ -5,6 +5,7 @@ Major contributors to date:
 - [liz](https://github.com/L1Z3): firmware, CAN reverse-engineering
 - [tylerharvey](https://github.com/tylerharvey): glue guy/productizing
 - [Tichael](https://github.com/Tichael): technical review
+- [Kenny](https://www.reddit.com/user/KennyBS167/submitted/): technical review
 - [Thomas](https://www.ioniqforum.com/members/thomas212.6422/): CAN reverse-engineering
 
 # Structure
@@ -25,9 +26,10 @@ Videos of the button in action:
 1. CAN messages:
    - The necessary CAN messages to initiate preconditioning on 2021-2024 E-GMP cars were isolated by dragz and I in early March 2026. 
 2. microcontroller: 
-   - We have a line on a cheap prepackaged microcontroller. If you follow the breadcrumbs, it's fairly easy to work out what we plan to use. But since there are a limited quantity remaining, I'll avoid clearly stating what it is.
+   - We are using a low-cost prepackaged microcontroller to piggyback on existing work and open-source code
 3. firmware:
-   - So far, Liz and I have worked on firmware for the microcontroller [here](https://github.com/tylerharvey/animatronic_panda). I am very excited to say that [Liz's firmware works!](https://youtu.be/1I849mg2cQ4?si=igR4gxgVAqW1klbn)
+   - Liz and I (mostly Liz) have [working firmware](https://youtu.be/1I849mg2cQ4?si=igR4gxgVAqW1klbn) for one prototype microcontroller [here](https://github.com/tylerharvey/animatronic_panda)
+   - Liz is porting the logic to [WiCAN firmware](https://github.com/L1Z3/wicant-i-precondition)
 
 4. wiring harness: 
    - I am in discussions with about 5 vendors on harness assembly. I have samples made from one, shipping to me shortly. 
