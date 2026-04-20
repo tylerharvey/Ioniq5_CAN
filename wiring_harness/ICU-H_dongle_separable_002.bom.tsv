@@ -1,0 +1,30 @@
+Id	Description	Qty	Unit	Designators	Manufacturer	MPN
+1	Cable, copper, TXL insulated, 1 x 0.3 mm²	0.3	m	W2_GND, W3d_GND		
+2	Cable, copper, TXL insulated, 1 x 1.25 mm²	0.1	m	W4_PWR		
+3	Cable, copper, TXL insulated, 18 x 0.3 mm²	0.05	m	W1		
+4	Cable, copper, TXL insulated, 2 x 0.3 mm²	0.01	m	W3e_GND2		
+5	Cable, copper, TXL insulated, twisted pair, 2 x 0.3 mm²	1.5	m	W2_B_twisted, W2_C_twisted, W2_E_twisted, W2_G_twisted, W2_I_twisted, W2_M_twisted, W2_P_twisted, W3_twisted, W3b_twisted, W3c_twisted		
+6	Connector, 1-pin, female, 1 pins	1		GND_f	Star	ST1501-1.5-21PG
+7	Connector, 1-pin, male, 1 pins	1		GND_m	Star	ST1501-1.5-11PG
+8	Connector, 3-pin, female, 3 pins	3		CAN_selector, CAN_selector2, CAN_selector3	Star	ST1803-0.7-21
+9	Connector, 3-pin, male, 3 pins	7			Star	ST1803-0.7-11
+10	Connector, 32-pin, female, 32 pins	1		ST1532_0p7_21TD	Star	ST1532-0.7-21TD
+11	Connector, 32-pin, male, 32 pins	1		ST1532_0p7_11TD	Star	ST1532-0.7-11TD
+12	Connector, OBD2, female, 16 pins	1		OBD2	Molex	51115-1611
+13	Connector, Splice, 1 pins	1		SGND		
+14	Connector, fuse tap, micro2, 1 pins	1		Fuse_tap	Star	ST304 Micro 2
+15	Crimp	58		CAN_selector, CAN_selector2, CAN_selector3, GND_f, GND_m, ST1532_0p7_11TD, ST1532_0p7_21TD		
+16	Crimp, OBD2 Terminal	9		OBD2	Molex	50420-8000
+17	Retainer, OBD2 Retainer	9		OBD2	Molex	51117-1605
+18	Sleeve, Tesa 3/4" tape (IB151608)	0.35	m	W1, W2_GND, W3d_GND		
+19	heat-shrink label, B-CAN	1		W2_B_twisted		
+20	heat-shrink label, C-CAN	1		W2_C_twisted		
+21	heat-shrink label, E-CAN	1		W2_E_twisted		
+22	heat-shrink label, G-CAN	1		W2_G_twisted		
+23	heat-shrink label, I-CAN	1		W2_I_twisted		
+24	heat-shrink label, M-CAN	1		W2_M_twisted		
+25	heat-shrink label, P-CAN	1		W2_P_twisted		
+26	heat-shrink label, SELECT BUS	1		W3_twisted		
+27	heat-shrink label, SELECT BUS2	1		W3b_twisted		
+28	heat-shrink label, SELECT BUS3	1		W3c_twisted		
+29	micro2 fuse, 10A	1		Fuse_tap		
