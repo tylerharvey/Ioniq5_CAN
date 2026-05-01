@@ -1,9 +1,10 @@
 # Purpose 
 We are working to take to market a fully open-source design for an Ioniq 5 preconditioning button and similar features (e.g. remote climate) that can be implemented with a hardware retrofit. This repository serves to document progresss on Ioniq 5 CAN reverse-engineering and progress towards a sellable kit.
 Major contributors to date:
-- [dragz](https://github.com/dragz): CAN reverse-engineering
-- [liz](https://github.com/L1Z3): firmware, CAN reverse-engineering
-- [tylerharvey](https://github.com/tylerharvey): glue guy/productizing
+- [Liz](https://github.com/L1Z3): firmware, CAN reverse-engineering
+- [Tyler](https://github.com/tylerharvey): glue guy/productizing
+- [Corbin](https://www.theioniqguy.com): testing, strategy, marketing, retail
+- [Roy](https://github.com/dragz): CAN reverse-engineering
 - [Tichael](https://github.com/Tichael): technical review
 - [Kenny](https://www.reddit.com/user/KennyBS167/submitted/): technical review
 - [Thomas](https://www.ioniqforum.com/members/thomas212.6422/): CAN reverse-engineering
@@ -24,15 +25,14 @@ Videos of the button in action:
 
 # Current Status
 1. CAN messages:
-   - The necessary CAN messages to initiate preconditioning on 2021-2024 E-GMP cars were isolated by dragz and I in early March 2026. 
+   - The necessary CAN messages to initiate preconditioning on 2021-2024 E-GMP cars were isolated by dragz and I in early March 2026. Roy plans to host a DBC file to collect known CAN frames.
 2. microcontroller: 
    - We are using a low-cost prepackaged microcontroller to piggyback on existing work and open-source code
 3. firmware:
    - Liz and I (mostly Liz) have [working firmware](https://youtu.be/1I849mg2cQ4?si=igR4gxgVAqW1klbn) for one prototype microcontroller [here](https://github.com/tylerharvey/animatronic_panda)
-   - Liz is porting the logic to [WiCAN firmware](https://github.com/L1Z3/wicant-i-precondition)
-
+   - Liz successfully ported the logic to two branches of [WiCAN firmware](https://github.com/L1Z3/wicant-i-precondition)
 4. wiring harness: 
-   - I am in discussions with about 5 vendors on harness assembly. I have samples made from one, shipping to me shortly. 
+   - First inventory has been ordered from one vendor
    - ![samples](./wiring_harness/first_samples.png)
 5. user interface:
    - As a first user interface, Liz wrote the firmware to [activate and deactivate](https://youtu.be/3RfnEo8Xc0o?si=r9ix7-klKYVObkZd) preconditioning on star button press. We are actively weighing other interface options (WiFi, USB buttons, etc.).
@@ -45,9 +45,9 @@ Two logs (in SavvyCAN format, with timestamps in microseconds) of CAN messages f
 I am including two real recorded logs [1](CAN_logs/M-CAN_driving_with_nav_preconditioning_at_end_cleaned.csv) and [2](CAN_logs/M-CAN_start_nav_to_EA_parked_in_D_preconditioning_cleaned.csv) that included activation of preconditioning; two real recorded logs designed as control experments using the built-in navigation but not navigating to a nearby charger [1](CAN_logs/M-CAN_driving_with_nav_to_school_no_preconditioning_including_reroute.csv) and [2](CAN_logs/M-CAN_start_nav_to_school_parked_in_D.csv); and a parsing [script](CAN_parsing/parsing_MWE.ipynb) that I retroactively edited to show the most valuable parsing steps I took to identify the minimal working examples (MWEs)
 ## 3. harness designs
 Samples have been made for this harness design:
-![drawing 007](wiring_harness/M-CAN_dongle_shunt_caps_007_stamped.pdf)
+![drawing 007](wiring_harness/M-CAN_dongle_shunt_caps_007-1_stamped.pdf)
 
-I am also including the [source file](wiring_harness/M-CAN_dongle_shunt_caps_007.yml) used to render the drawings with [wireviz](https://github.com/wireviz/WireViz/). Wireviz was easy to learn and good for a reasonably straightforward harness, but has some limitations: 
+I am also including the [source file](wiring_harness/M-CAN_dongle_shunt_caps_007-1.yml) used to render the drawings with [wireviz](https://github.com/wireviz/WireViz/). Wireviz was easy to learn and good for a reasonably straightforward harness, but has some limitations: 
 - no built-in way to draw resistors or any other basic circuit component besides wires
 - no way to directly connect a wire to a wire besides an invisible splice, which confused some vendors
 
