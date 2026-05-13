@@ -101,7 +101,7 @@ def return_frame_IDs_muids(dict_name, reject_muids = [], bus = None):
                 frames_and_muids.append(frame_and_muid(frame_id,unique_muid))
     return frames_and_muids
 
-def return_frame_IDs_muids_with_message_changes_in_timestamp_range(dict_name,timestamp_range, reject_muids = [], threshold = 10):
+def return_frame_IDs_muids_with_message_changes_in_timestamp_range(dict_name,timestamp_range, reject_muids = [], threshold = 10, only_within_range=True):
     '''
     This is a search for control signals, rather than physical sensors. Physical sensors can have a nearly infinite number of values.
     '''
@@ -113,7 +113,9 @@ def return_frame_IDs_muids_with_message_changes_in_timestamp_range(dict_name,tim
                 if(unique_muid not in reject_muids):
                     indices = np.argwhere((dict_name['messages_unique_ids'] == unique_muid)*(dict_name['ids'] == frame_id))[:,0]
                     timestamps = dict_name['timestamps'][indices]
-                    if(timestamps[0] > timestamp_range[0] and timestamps[-1] < timestamp_range[-1]):
+                    if(only_within_range and timestamps[0] > timestamp_range[0] and timestamps[-1] < timestamp_range[-1]):
+                        frames_and_muids.append(frame_and_muid(frame_id,unique_muid))
+                    elif(only_within_range == False and ((timestamps > timestamp_range[0])*(timestamps < timestamp_range[1])).sum()):
                         frames_and_muids.append(frame_and_muid(frame_id,unique_muid))
     return frames_and_muids
 
