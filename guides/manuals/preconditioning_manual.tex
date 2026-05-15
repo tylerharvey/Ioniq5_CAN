@@ -1,0 +1,84 @@
+\documentclass[superscriptaddress,onecolumn,floatfix]{revtex4-2}
+
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{color}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage[loose]{units}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{braket}
+\usepackage[caption=false]{subfig}
+\usepackage[english]{babel}
+\usepackage{letltxmacro}
+
+\LetLtxMacro{\ORIGselectlanguage}{\selectlanguage}
+\makeatletter
+\DeclareRobustCommand{\selectlanguage}[1]{%
+    \@ifundefined{alias@\string#1}
+      {\ORIGselectlanguage{#1}}
+      {\begingroup\edef\x{\endgroup
+         \noexpand\ORIGselectlanguage{\@nameuse{alias@#1}}}\x}%
+}
+\newcommand{\definelanguagealias}[2]{%
+  \@namedef{alias@#1}{#2}%
+}
+\makeatother
+
+\definelanguagealias{en}{english}
+
+
+\begin{document}
+                            
+\begin{abstract}
+  This manual covers basic use and frequently asked questions for the manual preconditioning kit.
+\end{abstract}
+\title{Preconditioning Kit Manual}
+\author{Electroniq Buttons Boutique}
+\email{support@electroniqbuttons.com}
+\date{\today}
+
+\maketitle
+
+\section{Basic Setup}
+Start with the \href{https://github.com/tylerharvey/Ioniq5_CAN/guides/}{installation guides}.  See \href{https://meatpihq.github.io/wican-fw/config/wifi}{WiCAN docs} for basic WiCAN setup. This is not necessary to activate preconditioning, but it's highly recommended that you at least change the default WiFi password for security.  
+
+\section{User Interface}
+To activate preconditioning manually, just press the star button on your steering wheel. You should immediately see a countdown in meters/yards on your cluster that hijacks the distance-to-destination indicator. Preconditioning starts when this countdown reaches zero. If the countdown resets, that means something unexpected happened and it's retrying. 
+
+When preconditioning activates, you'll see the standard popup saying, "Battery preconditioning activated for optimal DC charging." You'll also get a snowflake or red coil icon over the battery symbol.
+
+If preconditioning never activates, confirm that built-in conditions for activation are met:
+\begin{enumerate}
+  \item Battery temperature must be less than $\unit[21]{C}$/$\unit[70]{F}$
+  \item State of charge must be higher than $\unit[20]{\%}$
+\end{enumerate}
+Unfortunately, these are limits that are built into battery management unit firmware that we cannot change with this kit.
+\section{Frequently Asked Questions}
+\begin{enumerate}
+  \item[Q:] How do I install it?
+  \item[A:] See the \href{https://github.com/tylerharvey/Ioniq5_CAN/guides/cars/}{installation guides}. If this looks too complicated, ask your nearest teenager or car audio shop for help!
+  \item[Q:] Does this make my car easier to steal?
+  \item[A:] Not likely, but the installation is designed to be difficult to see for multiple reasons, including security. We highly recommend changing your WiCAN password. 
+  \item[Q:] Which cars does this work on?
+  \item[A:] The kit is designed to work on 2021-2024 Ioniq 5s, 2022-2025 Ioniq 6s, and 2022-2024 EV6s. We have tested on Ioniq 5s from three different markets, as well as one Ioniq 6 and one EV6. \href{mailto:requests@electroniqbuttons.com}{Contact us} if you're interested in using the kit on a different car.
+  \item[Q:] What if I want to build this myself?
+  \item[A:] Do it! Everything we've done is \href{https://github.com/tylerharvey/Ioniq5_CAN}{open-source}. Feel free to use the wiring harness diagram to build something yourself. The connectors are available on AliExpress. However, if you make a contribution to public knowledge in the form of a pull request to the \href{https://github.com/dragz/egmpdbc}{DBC file} or something else, rebates are available that will bring the net cost down to competitive-with-DIY pricing with a lot less labor.
+  \item[Q:] Why can't this be a software update?
+  \item[A:] It could be. We have our guesses as to why Hyundai/Kia hasn't included this in a navigation update. If you  know how to \href{https://discord.gg/zyrngQ5qQ}{hack your head unit} and have found the CAN interface functions, you are welcome to add a manual preconditioning button to your head unit. However, distribution of hacked firmware is not possible at this time, so an aftermarket "update" would be difficult to make widely available.
+  \item[Q:] Will you build me a new button?
+  \item[A:] Maybe! Email us at \href{mailto:requests@electroniqbuttons.com}{requests@electronicbuttons.com} with your requests.
+\end{enumerate}
+% \begin{figure}[h]
+%   \subfloat[]{\label{subfig:overview:harness}
+%   \includegraphics[height=1.95in]{photos/whole_harness.jpg} }
+%   \subfloat[]{\label{subfig:overview:shunt_cap_labeled}
+%   \includegraphics[height=1.95in]{photos/labeled_connectors_MITM_harness.jpg} }
+%    \caption{(a) Man-in-the-middle harness. (b) Overview of connectors showing shunt cap. \label{fig:overview}}
+% \end{figure}
+\appendix 
+\bibliographystyle{apsrev4-1}
+\bibliography{stemh_model}{}
+\end{document}
