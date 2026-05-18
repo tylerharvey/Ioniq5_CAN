@@ -1,7 +1,7 @@
 > Car, give me the grace to accept with serenity the things that cannot be changed, courage to build the buttons that Hyundai will never offer as an update, and the wisdom to distinguish the one from the other. 
 
 # Purpose 
-We preparing to sell a fully open-source design for an Ioniq 5 preconditioning button that can be implemented with a hardware retrofit kit. This repository serves to document progresss on Ioniq 5 CAN reverse-engineering and status updates on the hardware and software for the kit.
+We preparing to sell a fully open-source Ioniq 5/6/EV6 preconditioning button that can be implemented with a hardware retrofit kit. This repository serves to document progresss on Ioniq 5 CAN reverse-engineering and status updates on the hardware and software for the kit.
 Major contributors to date:
 - [Liz](https://github.com/L1Z3): firmware, CAN reverse-engineering
 - [Tyler](https://github.com/tylerharvey): glue guy/productizing
@@ -10,6 +10,10 @@ Major contributors to date:
 - [Tichael](https://github.com/Tichael): technical review
 - [Kenny](https://www.reddit.com/user/KennyBS167/submitted/): technical review
 - [Thomas](https://www.ioniqforum.com/members/thomas212.6422/): CAN reverse-engineering
+
+Other repositories for this project: 
+- [manual preconditioning firmware repository](https://github.com/L1Z3/wicant-i-precondition)
+- [known CAN messages in DBC format](https://github.com/dragz/egmpdbc)
 
 # Basic Explanation
 This kit installs just below the car's head unit, in between the head unit and the rest of the car. That allows our microcontroller to duplicate or override any requests the head unit makes of the rest of the car. That allows us to request that the battery management unit initiates preconditioning in exactly the same way the head unit makes that request when using the built-in navigation.
@@ -71,11 +75,12 @@ I am also including the [source file](wiring_harness/M-CAN_dongle_shunt_caps_007
 - no way to directly connect a wire to a wire besides an invisible splice, which confused some vendors
 ## 4. guides
 Written guides are available for:
+- [basic use of the kit](guides/manuals/preconditioning_manual.pdf)
 - [harness mode switching](guides/harnesses/head_unit_MITM/MITM_harness_modes.pdf)
 - [Ioniq 5 install](guides/cars/E-GMP_gen1/Ioniq5/head_unit_preconditioning_kit_install.pdf)
 
 # CAN Reverse Engineering Tips/Resources
-One or two good logs is far more valuable than 10 questionable logs. I had much better success after identifying my best logs and cleaning them (e.g. out-of-range timestamps from extra acquisitions). Think of log acqusition as a scientific experiment: you want a test and a control condition. In the case of preconditioning, that meant setting the nav to a charger nearby vs. to a school nearby. You can also tag logs with known messages. I plan to use the star buttons for this purpose.
+One or two good logs is far more valuable than 10 questionable logs. I had much better success after identifying my best logs and cleaning them (e.g. out-of-range timestamps from buffered data). Think of log acqusition as a scientific experiment: you want a test and a control condition. In the case of preconditioning, that meant setting the nav to a charger nearby vs. to a school nearby. You can also tag logs with known messages, such as the star button. If all else fails, plotting temporal changes in a large range of messages can offer a lot of insight and help identify interesting frame IDs.
 
 Resources:
 - [canbus tools](https://github.com/ajouatom/canbus-tools): a better/longer list of resources

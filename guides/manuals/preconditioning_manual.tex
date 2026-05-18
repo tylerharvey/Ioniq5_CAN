@@ -43,7 +43,7 @@
 \maketitle
 
 \section{Basic Setup}
-Start with the \href{https://github.com/tylerharvey/Ioniq5_CAN/guides/}{installation guides}.  See \href{https://meatpihq.github.io/wican-fw/config/wifi}{WiCAN docs} for basic WiCAN setup. This is not necessary to activate preconditioning, but it's highly recommended that you at least change the default WiFi password for security.  
+Start with the \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/}{installation guides}.  See \href{https://meatpihq.github.io/wican-fw/config/wifi}{WiCAN docs} for basic WiCAN setup. This is not necessary to activate preconditioning, but it's highly recommended that you at least change the default WiFi password for security.  
 
 \section{User Interface}
 To activate preconditioning manually, just press the star button on your steering wheel. You should immediately see a countdown in meters/yards on your cluster that hijacks the distance-to-destination indicator. Preconditioning starts when this countdown reaches zero. If the countdown resets, that means something unexpected happened and it's retrying. 
@@ -59,7 +59,9 @@ Unfortunately, these are limits that are built into battery management unit firm
 \section{Frequently Asked Questions}
 \begin{enumerate}
   \item[Q:] How do I install it?
-  \item[A:] See the \href{https://github.com/tylerharvey/Ioniq5_CAN/guides/cars/}{installation guides}. If this looks too complicated, ask your nearest teenager or car audio shop for help!
+  \item[A:] See the \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/}{installation guides}. If this looks too complicated, ask your nearest teenager or car audio shop for help!
+  \item[Q:] Why does my backup camera, car app, or other center screen feature not work after installation?
+  \item[A:] Check the \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/harnesses/head_unit_MITM/MITM_harness_modes.pdf}{harness modes guide}. If you have a WiCAN original or no device plugged into the OBD port, the harness must be in parallel mode. If you have a customized WiCAN, the harness should be in MITM mode.
   \item[Q:] Does this make my car easier to steal?
   \item[A:] Not likely, but the installation is designed to be difficult to see for multiple reasons, including security. We highly recommend changing your WiCAN password. 
   \item[Q:] Which cars does this work on?
@@ -68,6 +70,14 @@ Unfortunately, these are limits that are built into battery management unit firm
   \item[A:] Do it! Everything we've done is \href{https://github.com/tylerharvey/Ioniq5_CAN}{open-source}. Feel free to use the wiring harness diagram to build something yourself. The connectors are available on AliExpress. However, if you make a contribution to public knowledge in the form of a pull request to the \href{https://github.com/dragz/egmpdbc}{DBC file} or something else, rebates are available that will bring the net cost down to competitive-with-DIY pricing with a lot less labor.
   \item[Q:] Why can't this be a software update?
   \item[A:] It could be. We have our guesses as to why Hyundai/Kia hasn't included this in a navigation update. If you  know how to \href{https://discord.gg/zyrngQ5qQ}{hack your head unit} and have found the CAN interface functions, you are welcome to add a manual preconditioning button to your head unit. However, distribution of hacked firmware is not possible at this time, so an aftermarket "update" would be difficult to make widely available.
+  \item[Q:] Will this kill my ICCU?
+  \item[A:] No.
+  \item[Q:] Will this kill my 12V battery?
+  \item[A:] Like an OBD reader plugged into the normal OBD port, the WiCAN adds some power usage when the car is off. However, the WiCAN comes with a power saving mode for this purpose. If you're very concerned about this, we encourage you to set the \href{https://meatpihq.github.io/wican-fw/config/sleep-mode}{sleep voltage cutoff} higher to be safer. 
+  \item[Q:] Can I use the built-in navigation while using this kit?
+  \item[A:] With the beta version, this is not possible. This will be fixed with the customized WiCAN.
+  \item[Q:] Will a navigation update affect my ability to use the kit?
+  \item[A:] It's highly unlikely, as the kit doesn't depend on communication with the head unit. A battery management unit update could (for instance, the update that enabled preconditioning retroactively on early Ioniq 5s), but we believe those must be done by dealerships. However, we can't promise with 100\% certainty that a navigation update will not affect the functionality of the kit. In the off chance that this does happen, let us know and we will do our best to update logic to restore manual preconditioning functionality.
   \item[Q:] Will you build me a new button?
   \item[A:] Maybe! Email us at \href{mailto:requests@electroniqbuttons.com}{requests@electronicbuttons.com} with your requests.
 \end{enumerate}
