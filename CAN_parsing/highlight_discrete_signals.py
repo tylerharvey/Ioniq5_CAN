@@ -58,9 +58,10 @@ DEFAULT_DBCS = [os.path.join(os.path.dirname(DEFAULT_DBC), f)
 def _extract_message_blocks(text):
     """Yield (frame_id, block_lines) for each BO_ block in stripped DBC text.
 
-    A block runs from a `BO_ <id>` line through any following SG_ / VAL_ lines
-    until the next top-level keyword. Original byte order and VAL_ tables are
-    preserved verbatim.
+    A block runs from a `BO_ <id>` line through any following SG_ lines until
+    the next top-level keyword. Original byte order is preserved verbatim.
+    VAL_ lines are handled separately (see `_extract_val_tables`): in these
+    DBCs they live in a trailing section rather than inside the BO_ block.
     """
     block = None
     block_id = 0
@@ -74,13 +75,29 @@ def _extract_message_blocks(text):
             parts = line.split()
             block_id = int(parts[1])
             block = [raw]
-        elif block is not None and (line.startswith('SG_') or line.startswith('VAL_')):
+        elif block is not None and line.startswith('SG_'):
             block.append(raw)
         elif block is not None:
             yield block_id, block
             block = None
     if block is not None:
         yield block_id, block
+
+
+def _extract_val_tables(text):
+    """Group VAL_ value-table lines by the message id they define."""
+    tables = {}
+    for raw in text.splitlines():
+        line = raw.strip()
+        if not line.startswith('VAL_ '):
+            continue
+        parts = line.split()
+        try:
+            fid = int(parts[1])
+        except (IndexError, ValueError):
+            continue
+        tables.setdefault(fid, []).append(raw)
+    return tables
 
 
 def load_dbc(dbc_paths):
@@ -109,10 +126,14 @@ def load_dbc(dbc_paths):
         except Exception as e:
             print(f"WARN: could not parse DBC {path}: {e}", file=sys.stderr)
             continue
+        val_tables = _extract_val_tables(stripped)
         for fid, block in _extract_message_blocks(stripped):
             if fid in seen:
                 continue
             seen.add(fid)
+            # VAL_ lines define signal value names; without them choices are
+            # lost (the raw text would attach them to the wrong BO_ block).
+            block = list(block) + val_tables.get(fid, [])
             try:
                 with contextlib.redirect_stdout(io.StringIO()):
                     merged.add_dbc_string('\n'.join(block))
@@ -144,7 +165,7 @@ TITLE_EXPECTATIONS = {
     'nothing_happening': [],          # expect no discrete changes
     'nothing_on': [],                 # expect no discrete changes
     'already_preconditioning': ['0x4cc', '0x4e8'],     # state stays On; no toggle
-    'gv60': ['0xa82aa03', '0x4cc', '0x4e8'],  # GV60: extended BMS_Precond id
+    'gv60': ['0xa82aa03'],  # GV60: extended BMS_Precond id (replaces standard ids)
     'head_unit_only': [],             # depends on the rest of the title
 }
 
@@ -362,17 +383,22 @@ def verify_log(log_path, dbc_results, muid_results):
     expected = set()
     for kw in keywords:
         expected.update(TITLE_EXPECTATIONS[kw])
+    if 'gv60' in keywords:
+        # GV60 logs carry the extended BMS_Precond id (0x0A82AA03); the
+        # standard M-CAN preconditioning ids are not present on that platform.
+        expected = set(TITLE_EXPECTATIONS['gv60'])
     if not expected:
         return [], 'no metadata match'
-    seen = set()
+    # compare by numeric id, not zero-padded hex strings, so 0x38 == 0x038
+    seen_ids = set()
     for res in dbc_results:
-        seen.add(f"0x{res['frame_id']:03X}".lower())
+        seen_ids.add(int(res['frame_id']))
     for fr in muid_results:
-        seen.add(f"0x{fr['frame_id']:03X}".lower())
+        seen_ids.add(int(fr['frame_id']))
 
     checks = []
-    for exp in sorted(expected):
-        ok = exp in seen
+    for exp in sorted(expected, key=lambda s: int(s, 16)):
+        ok = int(exp, 16) in seen_ids
         note = 'found' if ok else 'MISSING'
         if exp in ('0x2ad', '0x4ed', '0x4cc') and not ok and any(kw == 'no_preconditioning'
                                                                  for kw in keywords):
