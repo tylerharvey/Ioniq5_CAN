@@ -39,11 +39,9 @@ Videos of the button in action:
 - [demonstration of beta kit](https://youtu.be/37fBu63kVeo?si=eVobnYavg8i2hmdD)
 
 # Current Status
-We have successfully tested manual preconditioning on 3 different microcontrollers, on 3 Ioniq 5s from 3 different markets, on a US Ioniq 6, and will shortly test on a Canadian EV6. First orders shipped in late June.
-- ![selectable CAN harnesses](./wiring_harness/photos/selectable_CAN_bulk.jpg)
-- ![head unit harnesses](./wiring_harness/photos/head_unit_bulk.jpg)
+Kits have shipped to about 40 people. Liz and Tyler have had the first prototype custom WiCAN installed in their cars for over a month, and [wicant-i-precondition](https://github.com/L1Z3/wicant-i-precondition) automatically supports both wiCANs in a single main branch. We will test the second prototype shortly. Shipping of the custom WiCANs will occur in the fall. We are rapidly releasing firmware updates, so if you've purchased the kit, check [releases](https://github.com/L1Z3/wicant-i-precondition/releases/) for the latest and follow [these instructions](https://meatpihq.github.io/wican-fw/config/firmware-update/) to update your WiCAN.
 
-We are shipping Liz's [WiCAN firmware](https://github.com/L1Z3/wicant-i-precondition) on stock WiCAN-OBD-C3s for the beta run. 
+We are shipping a [fork of WiCAN firmware lead by Liz](https://github.com/L1Z3/wicant-i-precondition) on stock WiCAN-OBD-C3s for the beta run. 
 
 Roy is gathering known E-GMP CAN bus information in [DBC files](https://github.com/dragz/egmpdbc) and has [prototyped a UI](https://github.com/dragz/ironiq) based on a Lilygo T-Display S3.
 
@@ -52,7 +50,7 @@ Roy is gathering known E-GMP CAN bus information in [DBC files](https://github.c
    - The necessary CAN messages to initiate preconditioning on 2021-2024 E-GMP cars were isolated by Roy and I in early March 2026. 
 2. microcontroller: 
    - We are using a low-cost prepackaged microcontroller to piggyback on existing work and open-source code
-   - Beta test units will use a stock WiCAN-OBD-C3 initially, and receive a customized WiCAN later
+   - Beta test units will use a stock WiCAN-OBD-C3 initially, and receive a customized WiCAN (WiCAN-EB-S3) later
    - The customized WiCAN has been designed and is in testing now
 3. firmware:
    - Liz and I (mostly Liz) have [working firmware](https://youtu.be/1I849mg2cQ4?si=igR4gxgVAqW1klbn) for one prototype microcontroller [here](https://github.com/tylerharvey/animatronic_panda)
@@ -76,7 +74,7 @@ As of early June, the business has incurred roughly the following costs:
 - $500 in miscellaneous business expenses 
 - $500 in various shipping costs
 
-Roy, Liz and Tyler have committed several hundred hours in labor to date, and Michaël has also put in a lot of work on a related project that may be merged in. If all current inventory sold at currently listed prices on the Shopify or Etsy shops, after platform fees but before any taxes, the business would see about $14,500 in revenue. As we still will order customized WiCANs (expected to cost about $4000 for all beta test kits), this leaves about $1000 available to pay people for labor on the first inventory and break even. We hope to eventually make minimum wage on this project, but it may take some time! 
+Roy, Liz and Tyler have committed several hundred hours in labor to date, and Michaël has also put in a lot of work on a related project that may be merged in. If all current inventory sold at currently listed prices on the Shopify or Etsy shops, after platform fees but before any taxes, the business would see about $14,500 in revenue. As we still will order customized WiCANs (expected to cost about $4000 for all beta test kits), this leaves about $1000 available to pay people for labor on the first inventory and break even. We hope to eventually make minimum wage on this project, but it may take some time! The business is cash-flow positive, so we will get there.
 
 # Contents
 Structure of this repository:
@@ -105,7 +103,9 @@ One or two good logs is far more valuable than 10 questionable logs. I had much 
 General CAN resources:
 - [CSS electronics](https://www.csselectronics.com/pages/can-bus-simple-intro-tutorial): many helpful introductory articles on CAN
 - [canbus tools](https://github.com/iDoka/awesome-canbus): a better/longer list of resources
+- [SavvyLens](https://github.com/SuperSuave/SavvyLens): a fork of SavvyCAN by a member of our community, with support for signal tagging and LLM integration for help parsing
 - [OVMS DBC file documentation](https://docs.openvehicles.com/en/latest/components/vehicle_dbc/docs/dbc-primer.html): basic explanation of the structure of a DBC file
+- [cantools](https://github.com/cantools/cantools): python library that can easily plot CAN-based signals using DBC files
 - [standalone Cabana](https://github.com/deanlee/openpilot-cabana): fork of openpilot Cabana for general-purpose CAN reverse-engineering
 - [kvaser.com](https://kvaser.com/): login needed but various CAN resources available free
 
@@ -114,15 +114,17 @@ Related projects:
 - [known CAN messages in DBC format](https://github.com/dragz/egmpdbc)
 - [ESP-based DIY build](https://github.com/dragz/ironiq)
 - [another Ioniq 5 CAN reverse engineering project](https://github.com/Sterlingarcher2525/ioniq5-can)
+- [OBD reverse engineering tools built for WiCAN](https://github.com/philipkocanda/canair)
 - [original Ioniq CAN reverse engineering](https://github.com/philipkocanda/ioniq-can) 
 - [Hyundai Kona VESS reverse engineering](https://github.com/ereuter/vess)
 
 # Contributing
-Feel free to join the conversation on [our Fluxer community](https://fluxer.gg/w0OpDJjG) or the [Discord mirror](https://discord.gg/zKyNAfmtU). PRs are welcome for install guide changes, harness requests, or CAN parsing tools.
+Feel free to join the conversation on [our Fluxer community](https://fluxer.gg/w0OpDJjG) or the [Discord mirror](https://discord.gg/zKyNAfmtU). PRs are welcome for install guide changes, harness requests, or CAN parsing tools. Since CAN reverse engineering is new to most of us, many people in this community utilize large language models in various ways depending on their initial skill level. Pull requests should clearly designate the level of human and LLM authorship. 
+
 ## Rebatable Contributions from Customers
 The following contributions are welcome and potentially eligible for a rebate:
 - Offer suggestions or photos to improve the [manual](./guides/manuals/) or [install guides](./guides/cars/) or product descriptions:
   - Document alternate EV6 OBD mount locations
-- Translate technical documentation into your language, particularly for German, Korean, Spanish and French
+- Review automated translations of technical documentation in your language, particularly for German, Korean, Spanish and French
 - Accepted pull request to [firmware repository](https://github.com/L1Z3/wicant-i-precondition) or [DBC repository](https://github.com/dragz/egmpdbc)
 - Prototype physical button (note: Michaël is currently working on this; get in touch with us to avoid duplication of effort; this probably goes beyond a rebate)
