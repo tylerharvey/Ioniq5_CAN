@@ -65,26 +65,33 @@ Start with the \href{https://github.com/tylerharvey/Ioniq5_CAN/tree/main/guides/
 We are rapidly releasing firmware updates, so check \href{https://github.com/L1Z3/wicant-i-precondition/releases/}{https://github.com/L1Z3/wicant-i-precondition/releases/} for the latest and follow these instructions: \href{https://meatpihq.github.io/wican-fw/config/firmware-update/}{https://meatpihq.github.io/wican-fw/config/firmware-update/} to update your WiCAN.
 
 \section{User Interface}
-We are rapidly developing the user interface, so check back here often!
+We are rapidly developing the user interface, so check back here often! This documentation describes the latest beta interface. If there are features here not available on your WiCAN and you want them, update it!
 
 To configure the manual preconditioning behavior, connect to the WiCAN WiFi and visit the WiCAN configuration page at \href{http://192.168.80.1}{http://192.168.80.1}. The third tab, called ``Buttons'', shown in Figure \ref{subfig:ui:buttons} allows for configuration of the manual preconditioning button and any other custom buttons that are added later.
 
 \begin{figure}[h]
   \subfloat[]{\label{subfig:ui:buttons}
-  \includegraphics[height=1.95in]{photos/ui_2026-07-04.png} }  \\
+  \includegraphics[height=1.95in]{photos/ui_2026-08-27.png} }  \\
    \caption{Screenshot of ``Buttons'' page in WiCAN http configuration.}
 \end{figure}
 
-The first option, ``Preconditioning Mode'', is currently in development and has only one allowed option: once. After triggering a single preconditioning cycle, preconditioning will stop. We are working on ``Continuous'' and ``Persistent'' modes that will allow the BMS to automatically re-heat the battery if the temperature drops either until the car is powered off (``Continuous'') or even through car on-off cycles (``Persistent'').
+The first option, ``Preconditioning Mode'', selects how long preconditioning continues once triggered:
+\begin{enumerate}
+  \item ``Once'' (default): after triggering a single preconditioning cycle, preconditioning will stop.
+  \item ``Continuous'': the BMS will automatically re-heat the battery if the temperature drops again, until the car is powered off.
+  \item ``Persistent'': like ``Continuous'', but the WiCAN remembers that preconditioning is enabled even through car on-off cycles, so it will automatically re-activate whenever you start the car.
+\end{enumerate}
 
-The second option allows you a choice of button to map preconditioning onto. More options will be available with the customized WiCAN (a replacement microcontroller shipping in October) in man-in-the-middle mode. By default, 5 options are displayed:
+The second option allows you a choice of button to map preconditioning onto. By default, 6 options are displayed:
 \begin{enumerate}
   \item Disabled
   \item Star Button (Steering Wheel) -- Default
   \item Star Button (Climate Bar)
   \item Tuner Press (Climate Bar)
   \item Volume Press (Climate Bar)
+  \item Setup (EV6 Climate Bar)
 \end{enumerate}
+The ``Setup'' button is only present on EV6 climate bars. More options are available with the customized WiCAN in man-in-the-middle mode.
 With ``Disabled'', no button will trigger preconditioning. This may be desirable when taking your car into a dealership for service to avoid confusing dealership service technicians. The ``press'' options refer to pressing in those buttons, as opposed to turning or pushing up or down. If none of these options work, you can check the ``Show all button options'' checkbox to enable more options:
 \begin{tasks}(2)
   \task Mode (Steering Wheel)
@@ -103,6 +110,18 @@ With ``Disabled'', no button will trigger preconditioning. This may be desirable
   \task Tuner Down (Climate Bar)
 \end{tasks}
 Pick the button that works for you! We hope to offer physical buttons soon.
+
+The third option, ``Preconditioning Press Type'', lets you choose whether the activation button triggers on a short press or a long press. With ``Short Press'', preconditioning triggers when you press and release the button within one second. With ``Long Press (hold 1s)'', you need to hold the button for at least one second; this can help avoid accidental triggering while driving.
+
+The fourth option, ``CAN Connection Mode'', is only shown when the WiCAN is connected to two CAN busses (the customized WiCAN in man-in-the-middle mode). With ``MITM (forward between buses)'', frames are forwarded between the two busses so the head unit and the rest of the car keep working normally, and preconditioning requests can be intercepted. With ``Parallel (no forwarding)'', no frames are forwarded. See the \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/harnesses/head_unit_MITM/MITM_harness_modes.pdf}{harness modes guide} for more detail on MITM vs.\ parallel.
+
+The first tab, ``Status'', shown in Figure \ref{subfig:ui:status}, shows the current high-voltage battery temperature (minimum and maximum across the battery), which is a convenient way to check whether preconditioning conditions are met (see below).
+
+\begin{figure}[h]
+  \subfloat[]{\label{subfig:ui:status}
+  \includegraphics[height=1.95in]{photos/ui_status_2026-08-27.png} }  \\
+   \caption{Screenshot of the ``Status'' page in WiCAN http configuration, including the high-voltage battery temperature readout.}
+\end{figure}
 
 To activate preconditioning manually, just press the activation button you've chosen. You should immediately see a countdown in meters/yards on your cluster that hijacks the distance-to-destination indicator. If you have cruise control on, it blocks the most obvious display of the distance-to-destination indicator. Use the pages button on the steering wheel to navigate to the cluster page that shows navigation instructions. Preconditioning starts when this countdown reaches zero. If the countdown resets, that means something unexpected happened and it's retrying. 
 
