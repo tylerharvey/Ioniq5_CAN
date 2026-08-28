@@ -30,7 +30,7 @@ This kit has a few moving parts:
 - wiring harnesss to adapt microcontroller to car (how to plug the box into the car)
 - user interface (the button that triggers preconditioning)
 
-The [CAN messages for preconditioning](preconditioning_messages/) have been documented since March 2026. We are shipping a first version of the microcontroller now with a free upgrade to a man-in-the-middle-capable version in a few months. The current firmware works well, and we are rapidly developing new features in firmware. The wiring harness has been extensively tested and is in bulk production, and may only slightly change in length to accommodate new installation methods. The current user interface allows for a choice of existing buttons on the car to trigger preconditioning, and we are working hard on physical buttons.
+The [CAN messages for preconditioning](preconditioning_messages/) have been documented since March 2026. We are shipping a first version of the microcontroller now, and you will have the option of a free trade-in or discounted purchase of the non-flickery customized WiCAN when it is available. The current firmware works well, and we are rapidly developing new features in firmware. The wiring harness has been extensively tested and is in bulk production, and may only slightly change in length to accommodate new installation methods. The current user interface allows for a choice of existing buttons on the car to trigger preconditioning, and we are working hard on physical buttons.
 
 Videos of the button in action:
 - [dragz triggering preconditioning from a laptop](https://youtu.be/vaBQV_6DW-M?si=8POdBs7m_WmN-vUu)
