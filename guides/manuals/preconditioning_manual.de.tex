@@ -35,9 +35,9 @@
 \selectlanguage{de}
 
 \begin{abstract}
-  Dieses Handbuch behandelt die grundlegende Verwendung und häufig gestellte Fragen zum manuellen Vorkonditionierungsset.
+  Dieses Handbuch erläutert die grundlegende Verwendung des manuellen Vorkonditionierungs-Kits und beantwortet häufig gestellte Fragen.
 \end{abstract}
-\title{Handbuch für das Vorbehandlungsset}
+\title{Handbuch für das Vorkonditionierungs-Kit}
 \author{Electroniq Buttons Boutique}
 \email{support@electroniqbuttons.com}
 \date{\today}
@@ -45,166 +45,166 @@
 \maketitle
 
 
-\section{Welche Autos können das nutzen?} \label{sect:eligibility}
-Das Kit ist für die meisten Ioniq 5-Modelle (2021–2024), Ioniq 6-Modelle (2022–2025) und EV6-Modelle (2022–2024) geeignet. Wir haben es an Ioniq 5-Modellen aus drei verschiedenen Märkten sowie an einem Ioniq 6 und einem EV6 getestet. \href{mailto:requests@electroniqbuttons.com}{Kontaktieren Sie uns} Falls Sie das Set in einem anderen Fahrzeug verwenden möchten: Es funktioniert nur mit einer Batterieheizung. Um dies zu überprüfen, suchen Sie bitte im Menü „EV“ nach dem „Batteriekonditionierungsmodus“. $\to$ EV-Einstellungen (siehe Abb. \ref{subfig:menus:EVsettings}) auf dem Headunit (zentraler Bildschirm) Ihres Autos (siehe Abb. \ref{subfig:menus:batt_cond}).
+\section{Für welche Fahrzeuge ist das Kit geeignet?} \label{sect:eligibility}
+Das Kit ist für die meisten Ioniq 5 der Modelljahre 2021 bis 2024, Ioniq 6 der Modelljahre 2022 bis 2025 und EV6 der Modelljahre 2022 bis 2024 ausgelegt. Es wurde an Ioniq 5 aus drei verschiedenen Märkten sowie an je einem Ioniq 6 und EV6 getestet. Wenn Sie das Kit in einem anderen Fahrzeug verwenden möchten, \href{mailto:requests@electroniqbuttons.com}{kontaktieren Sie uns bitte}. Das Kit funktioniert nur, wenn Ihr Fahrzeug über eine Batterieheizung verfügt. Prüfen Sie dies, indem Sie auf der Headunit (zentraler Bildschirm) im Menü ``EV'' unter ``EV-Einstellungen'' nach dem Eintrag ``Batteriekonditionierung'' suchen (siehe Abb. \ref{subfig:menus:EVsettings} und \ref{subfig:menus:batt_cond}).
 \begin{figure}[h]
   \subfloat[]{\label{subfig:menus:EVsettings}
   \includegraphics[height=1.95in]{photos/EV_settings.jpg} }
   \subfloat[]{\label{subfig:menus:batt_cond}
   \includegraphics[height=1.95in]{photos/battery_conditioning_mode.jpg} }
-   \caption{(a) So finden Sie das Menü für die EV-Einstellungen: Tippen Sie auf dem Hauptbildschirm auf das Symbol „EV“; tippen Sie anschließend im daraufhin erscheinenden Menü auf der linken Seite auf „EV-Einstellungen“. (b) Bildschirm „Batteriekonditionierungsmodus“. \label{fig:menus}}
+  \caption{(a) So öffnen Sie das Menü für die EV-Einstellungen: Tippen Sie auf dem Hauptbildschirm auf das Symbol ``EV'' und anschließend im links eingeblendeten Menü auf ``EV-Einstellungen''. (b) Bildschirm ``Batteriekonditionierung''. \label{fig:menus}}
 \end{figure}
 
-Falls Ihr Fahrzeug diesen Bildschirm nicht besitzt, sollten Sie dieses Set nicht kaufen. Bitte wenden Sie sich an einen Händler oder an erfahrene Fahrzeughalter in Ihrem Land, um zu klären, ob die Nachrüstung dieser Funktion in Ihrem Fahrzeug mit zusätzlichen Schritten möglich ist. Für die USA, Kanada oder Norwegen kontaktieren Sie uns bitte unter [Kontaktinformationen einfügen]. \href{mailto:support@electroniqbuttons.com}{support@electroniqbuttons.com} Gerne helfen wir Ihnen bei der Beurteilung anhand einiger Informationen zu Ihrem Auto.
+Wenn diese Option in Ihrem Fahrzeug nicht vorhanden ist, kaufen Sie das Kit bitte nicht. Wenden Sie sich an einen Händler oder an erfahrene Fahrzeughalter, um zu klären, ob sich diese Funktion mit zusätzlichen Schritten nachrüsten lässt. Wenn Sie sich in den USA, Kanada oder Norwegen befinden, können Sie uns unter \href{mailto:support@electroniqbuttons.com}{support@electroniqbuttons.com} kontaktieren. Wir helfen Ihnen gerne dabei, die Kompatibilität anhand einiger Angaben zu Ihrem Fahrzeug einzuschätzen.
 
-Wenn anstelle des in Abbildung 1 dargestellten „Batteriekonditionierungsmodus“ \ref{subfig:menus:batt_cond}Wenn Ihr Fahrzeug den „Wintermodus“ aktiviert hat, benötigt es lediglich ein Firmware-Update von einem Händler. Suchen Sie die entsprechende technische Serviceinformation für Ihr Land zu diesem Update und wenden Sie sich an Ihren nächstgelegenen autorisierten Händler. Nach Abschluss dieses Schritts und Bestätigung, dass der Menüpunkt „Batteriekonditionierungsmodus“ den „Wintermodus“ ersetzt hat, können Sie dieses Kit erwerben.
+Wenn Ihr Fahrzeug anstelle des in Abb. \ref{subfig:menus:batt_cond} gezeigten ``Batteriekonditionierungsmodus'' den ``Wintermodus'' anzeigt, ist ein Firmware-Update durch einen Händler erforderlich. Suchen Sie die für Ihr Land geltende technische Serviceinformation zu diesem Update und wenden Sie sich an einen qualifizierten Vertragshändler. Sobald das Update abgeschlossen und bestätigt ist, dass der Menüpunkt ``Batteriekonditionierungsmodus'' den ``Wintermodus'' ersetzt hat, können Sie dieses Kit erwerben.
 
-\section{Grundausstattung}
-Beginnen Sie mit dem \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/}{Installationsanleitungen}. Sehen \href{https://meatpihq.github.io/wican-fw/config/wifi}{WiCAN-Dokumente} Für die grundlegende WiCAN-Einrichtung. Dies ist für die Aktivierung der Vorkonditionierung nicht erforderlich, es wird jedoch dringend empfohlen, zumindest das Standard-WLAN-Passwort aus Sicherheitsgründen zu ändern.  
+\section{Grundlegende Einrichtung}
+Lesen Sie zunächst die \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/}{Installationsanleitungen}. Die grundlegende Einrichtung des WiCAN ist in den \href{https://meatpihq.github.io/wican-fw/config/wifi}{WiCAN-Dokumenten} beschrieben. Sie ist für die Aktivierung der Vorkonditionierung nicht erforderlich; aus Sicherheitsgründen empfehlen wir jedoch dringend, zumindest das Standard-WLAN-Passwort zu ändern.
 
 \section{Benutzeroberfläche}
-Wir entwickeln die Benutzeroberfläche rasant weiter, schauen Sie also regelmäßig hier vorbei!
+Wir entwickeln die Benutzeroberfläche derzeit schnell weiter. Schauen Sie daher regelmäßig hier vorbei!
 
-Um das manuelle Vorkonditionierungsverhalten zu konfigurieren, verbinden Sie sich mit dem WiCAN-WLAN und besuchen Sie die WiCAN-Konfigurationsseite unter \href{http://192.168.80.1}{http://192.168.80.1}Die dritte Registerkarte mit der Bezeichnung „Schaltflächen“ ist in Abbildung 1 dargestellt. \ref{subfig:ui:buttons} ermöglicht die Konfiguration der manuellen Vorkonditionierungstaste und aller anderen benutzerdefinierten Tasten, die später hinzugefügt werden.
+Um die manuelle Vorkonditionierung zu konfigurieren, verbinden Sie sich mit dem WiCAN-WLAN und rufen Sie die WiCAN-Konfigurationsseite unter \href{http://192.168.80.1}{http://192.168.80.1} auf. Die dritte Registerkarte ``Buttons'' (siehe Abb. \ref{subfig:ui:buttons}) dient zur Konfiguration der Taste für die manuelle Vorkonditionierung und aller weiteren benutzerdefinierten Tasten, die später hinzukommen.
 
 \begin{figure}[h]
   \subfloat[]{\label{subfig:ui:buttons}
   \includegraphics[height=1.95in]{photos/ui_2026-07-04.png} }  \\
-   \caption{Screenshot der Seite „Schaltflächen“ in der WiCAN-HTTP-Konfiguration.}
+  \caption{Screenshot der Registerkarte ``Buttons'' in der HTTP-Konfiguration des WiCAN.}
 \end{figure}
 
-Die erste Option, der „Vorkonditionierungsmodus“, befindet sich derzeit in der Entwicklung und kann nur einmalig aktiviert werden. Nach einem einzigen Vorkonditionierungszyklus wird die Vorkonditionierung beendet. Wir arbeiten an den Modi „Kontinuierlich“ und „Persistent“, die es dem Batteriemanagementsystem (BMS) ermöglichen, die Batterie automatisch wieder aufzuheizen, wenn die Temperatur sinkt – entweder bis zum Abstellen des Fahrzeugs („Kontinuierlich“) oder sogar über mehrere Ein- und Ausschaltzyklen hinweg („Persistent“).
+Die erste Option, ``Preconditioning Mode'', befindet sich derzeit noch in Entwicklung. Aktuell ist nur die Einstellung ``once'' verfügbar. Nach einem einzelnen Vorkonditionierungszyklus endet die Vorkonditionierung. Wir arbeiten an den Modi ``Continuous'' und ``Persistent''. Sie sollen es dem Batteriemanagementsystem (BMS) ermöglichen, die Batterie automatisch erneut aufzuheizen, wenn ihre Temperatur sinkt: entweder bis das Fahrzeug ausgeschaltet wird (``Continuous'') oder sogar über mehrere Ein- und Ausschaltzyklen hinweg (``Persistent'').
 
-Die zweite Option ermöglicht die Auswahl einer Taste zur Zuweisung der Vorkonditionierung. Weitere Optionen stehen mit dem angepassten WiCAN im Man-in-the-Middle-Modus zur Verfügung. Standardmäßig werden 5 Optionen angezeigt:
+Mit der zweiten Option wählen Sie die Taste aus, der die Vorkonditionierung zugewiesen wird. Im modifizierten WiCAN im Man-in-the-Middle-Modus werden weitere Optionen verfügbar sein. Standardmäßig werden fünf Optionen angezeigt:
 \begin{enumerate}
-  \item Deaktiviert
-  \item Sterntaste (Lenkrad) -- Standard
-  \item Stern-Schaltfläche (Klimaleiste)
-  \item Tuner Press (Klimabar)
-  \item Volumenpresse (Klimabar)
+  \item ``Disabled'' -- deaktiviert
+  \item ``Star Button (Steering Wheel)'' -- Stern-Taste am Lenkrad, Standard
+  \item ``Star Button (Climate Bar)'' -- Stern-Taste an der Klimaleiste
+  \item ``Tuner Press (Climate Bar)'' -- Tuner-Taste an der Klimaleiste drücken
+  \item ``Volume Press (Climate Bar)'' -- Lautstärketaste an der Klimaleiste drücken
 \end{enumerate}
-Bei der Option „Deaktiviert“ wird durch keine Taste die Vorkonditionierung ausgelöst. Dies kann beim Werkstattbesuch in einer Vertragswerkstatt von Vorteil sein, um Verwirrung bei den Servicetechnikern zu vermeiden. Die „Drücken“-Optionen beziehen sich auf das Drücken der Tasten, nicht auf Drehen oder Drücken nach oben oder unten. Sollte keine dieser Optionen funktionieren, können Sie das Kontrollkästchen „Alle Tastenoptionen anzeigen“ aktivieren, um weitere Optionen freizuschalten.
+Bei ``Disabled'' löst keine Taste die Vorkonditionierung aus. Das kann beim Besuch einer Vertragswerkstatt sinnvoll sein, damit Servicetechniker nicht verwirrt sind. Die mit ``Press'' bezeichneten Optionen beziehen sich auf das Drücken des jeweiligen Bedienelements, nicht auf das Drehen oder Schieben nach oben oder unten. Sollte keine dieser Optionen funktionieren, aktivieren Sie das Kontrollkästchen ``Show all button options'', um weitere Tasten freizuschalten.
 \begin{tasks}(2)
-  \task Modus (Lenkrad)
-  \task Sprechen (Lenkrad)
-  \task Anruf (Lenkrad)
-  \task Lautstärkeregler (Lenkrad)
-  \task Lautstärke erhöhen (Lenkrad)
-  \task Lautstärke verringern (Lenkrad)
-  \task Nach oben springen (Lenkrad)
-  \task Nach unten springen (Lenkrad)
-  \task OK (Lenkrad)
-  \task Karte (Klimabalken)
-  \task Navigation (Klimaleiste)
-  \task Medien (Klimabalken)
-  \task Tuner Up (Klimabar)
-  \task Tuner Down (Klimaleiste)
+  \task ``Mode (Steering Wheel)'' -- Modus (Lenkrad)
+  \task ``Speak (Steering Wheel)'' -- Sprechen (Lenkrad)
+  \task ``Call (Steering Wheel)'' -- Anrufen (Lenkrad)
+  \task ``Volume Press (Steering Wheel)'' -- Lautstärke drücken (Lenkrad)
+  \task ``Volume Up (Steering Wheel)'' -- Lautstärke erhöhen (Lenkrad)
+  \task ``Volume Down (Steering Wheel)'' -- Lautstärke verringern (Lenkrad)
+  \task ``Skip Up (Steering Wheel)'' -- Weiter (Lenkrad)
+  \task ``Skip Down (Steering Wheel)'' -- Zurück (Lenkrad)
+  \task ``OK (Steering Wheel)'' -- OK (Lenkrad)
+  \task ``Map (Climate Bar)'' -- Karte (Klimaleiste)
+  \task ``Nav (Climate Bar)'' -- Navigation (Klimaleiste)
+  \task ``Media (Climate Bar)'' -- Medien (Klimaleiste)
+  \task ``Tuner Up (Climate Bar)'' -- Tuner aufwärts (Klimaleiste)
+  \task ``Tuner Down (Climate Bar)'' -- Tuner abwärts (Klimaleiste)
 \end{tasks}
-Wählen Sie den für Sie passenden Button! Wir hoffen, bald auch physische Buttons anbieten zu können.
+Wählen Sie die für Sie passende Taste aus. Wir hoffen, bald auch separate, physische Knöpfe anbieten zu können.
 
-Um die Vorkonditionierung manuell zu aktivieren, drücken Sie einfach die gewünschte Aktivierungstaste. Sofort erscheint ein Countdown in Metern/Yards im Kombiinstrument, der die Entfernungsanzeige überlagert. Wenn der Tempomat eingeschaltet ist, wird die Entfernungsanzeige teilweise verdeckt. Navigieren Sie mit der Seitentaste am Lenkrad zur Seite mit den Navigationsanweisungen im Kombiinstrument. Die Vorkonditionierung startet, sobald der Countdown Null erreicht hat. Sollte der Countdown zurückgesetzt werden, ist ein unerwartetes Problem aufgetreten und der Vorgang wird wiederholt. 
+Um die Vorkonditionierung manuell zu aktivieren, drücken Sie einfach die ausgewählte Aktivierungstaste. Sofort sollte im Kombiinstrument ein Countdown in Metern oder Yards erscheinen, der die Anzeige der Entfernung zum Ziel nutzt. Bei aktiviertem Tempomat ist die Entfernungsanzeige teilweise verdeckt. Verwenden Sie die Seitentaste am Lenkrad, um im Kombiinstrument die Seite mit den Navigationsanweisungen aufzurufen. Die Vorkonditionierung beginnt, sobald der Countdown null erreicht. Wird der Countdown zurückgesetzt, ist ein unerwarteter Fehler aufgetreten und der Vorgang wird erneut versucht.
 
-Wenn die Vorkonditionierung aktiviert wird, erscheint das Standard-Popup mit der Meldung „Batterievorkonditionierung für optimales DC-Laden aktiviert“ (siehe Abbildung). \ref{subfig:precon:popup}Außerdem wird über dem Batteriesymbol in der unteren linken Ecke des Kombiinstruments ein Schneeflocken- oder rotes Spulensymbol angezeigt (siehe Abbildung). \ref{subfig:precon:coil}.
+Wenn die Vorkonditionierung startet, erscheint das Standard-Popup mit dem Text ``Batterievorkonditionierung für optimales DC-Laden aktiviert'' (siehe Abb. \ref{subfig:precon:popup}). Außerdem erscheint über dem Batteriesymbol unten links im Kombiinstrument ein Schneeflocken- oder rotes Spulensymbol (siehe Abb. \ref{subfig:precon:coil}).
 
 \begin{figure}[h]
   \subfloat[]{\label{subfig:precon:popup}
   \includegraphics[height=1.95in]{photos/precon_active.jpg} }  \\
   \subfloat[]{\label{subfig:precon:coil}
   \includegraphics[height=1in]{photos/coil_on_battery.jpg} }
-   \caption{(a) Screenshot des Pop-ups, das die erfolgreiche Aktivierung der Batterievorkonditionierung anzeigt. (b) Beispiel-Screenshot des Spulensymbols, das über dem Batteriesymbol in der unteren linken Ecke des Kombiinstruments liegt. \label{fig:precon}}
+   \caption{(a) Screenshot des Pop-ups zur erfolgreichen Aktivierung der Batterievorkonditionierung. (b) Beispiel-Screenshot des Spulensymbols über dem Batteriesymbol unten links im Kombiinstrument. \label{fig:precon}}
 \end{figure}
 
-Falls die Vorkonditionierung nicht aktiviert wird, überprüfen Sie, ob die integrierten Aktivierungsbedingungen erfüllt sind:
+Wenn die Vorkonditionierung nicht startet, prüfen Sie, ob die integrierten Aktivierungsbedingungen erfüllt sind:
 \begin{enumerate}
-  \item Die Batterietemperatur muss unter folgendem Wert liegen: $\unit[21]{C}$/$\unit[70]{F}$
-  \item Der Wert des Ladezustands muss höher sein als $\unit[20]{\%}$
-  \item Der Bildschirm „Batteriekonditionierungsmodus“ ist im Menü „EV-Einstellungen“ vorhanden (siehe Abschnitt \ref{sect:eligibility})
+  \item Die Batterietemperatur muss unter $\unit[21]{C}$/$\unit[70]{F}$ liegen.
+  \item Der Ladezustand muss über $\unit[20]{\%}$ liegen.
+  \item Der Bildschirm ``Batteriekonditionierung'' muss im Menü ``EV-Einstellungen'' vorhanden sein (siehe Abschnitt \ref{sect:eligibility}).
 \end{enumerate}
-Leider handelt es sich hierbei um Einschränkungen, die in der Firmware der Batteriemanagementeinheit oder der Hardware des Fahrzeugs verankert sind und die wir mit diesem Kit nicht ändern können.
+Diese Einschränkungen sind leider in der Firmware der Batteriemanagementeinheit oder in der Fahrzeughardware verankert und können mit diesem Kit nicht geändert werden.
 
 \section{Stromverbrauch}
-Dieses Set wird über das 12-V-Bordnetz Ihres Autos betrieben, das heißt, es kann Strom von der 12-V-Batterie Ihres Autos beziehen. Dazu sollten einige Punkte besprochen werden:
+Dieses Kit wird über das 12-V-Bordnetz Ihres Fahrzeugs versorgt und kann daher Strom aus der 12-V-Batterie beziehen. Dazu sind drei Fragen besonders relevant:
 \begin{enumerate}
-  \item Wie viel Strom verbraucht es?
-  \item Wird es die 12V-Batterie zerstören?
-  \item MITM vs. parallel
+  \item Wie viel Strom verbraucht das Kit?
+  \item Entlädt es die 12-V-Batterie?
+  \item MITM oder Parallelbetrieb?
 \end{enumerate}
 
-\subsection{Wie viel Strom verbraucht es?}
+\subsection{Wie viel Strom verbraucht das Kit?}
 
-Wir haben den Stromverbrauch mehrerer Mikrocontroller in verschiedenen Zuständen bei ausgeschaltetem Fahrzeug (12,7 V) gemessen. Die WiCAN-Tests im Normalbetrieb wurden ohne HTTP-Anfragen und ohne BLE-Verbindung über CarScanner oder ähnliches durchgeführt. Diese Tests erfolgten am wählbaren CAN-Kabelbaum, über den unseres Wissens derzeit keine OBD-Anfragen möglich sind. Daher verbrauchten die Mikrocontroller mit Standard-OBD-Funktionalität (WiCAN, vLinker MC+) wahrscheinlich weniger Strom als beim aktiven Abfragen von OBD-Parametern über den normalen OBD-Anschluss. 
+Wir haben die Stromaufnahme mehrerer Mikrocontroller in verschiedenen Betriebszuständen bei ausgeschaltetem Fahrzeug und einer Bordspannung von 12,7 V gemessen. Die WiCAN-Messungen im Normalbetrieb erfolgten ohne HTTP-Anfragen und ohne BLE-Verbindung über CarScanner oder eine ähnliche Anwendung. Die Messungen wurden am abgezweigten CAN-Kabelbaum durchgeführt, an dem nach unserem derzeitigen Kenntnisstand keine OBD-Anfragen möglich sind. Geräte mit standardmäßiger OBD-Funktionalität (WiCAN, vLinker MC+) haben daher wahrscheinlich weniger Strom aufgenommen als beim aktiven Abrufen von OBD-Parametern über den normalen OBD-Anschluss.
 
-\subsubsection{WiCAN Originalversion 4.20\_eb0.1.1-beta19}
+\subsubsection{WiCAN Original mit Version 4.20\_eb0.1.1-beta19}
 \begin{enumerate}
-  \item{Normale Verwendung:} 30 mA
-  \item{Verwendung von HTTP-Seiten:} bis zu 34 mA
-  \item{Startvorgang:} bis zu 36 mA
-  \item{CAN-Überwachung:} bis zu 38 mA
-  \item{Schlafen:} $<$1 mA
+  \item Normale Verwendung: 30 mA
+  \item Aufruf von HTTP-Seiten: bis zu 34 mA
+  \item Startvorgang: bis zu 36 mA
+  \item CAN-Überwachung: bis zu 38 mA
+  \item Schlafmodus: $<$1 mA
 \end{enumerate}
 
-\subsubsection{WiCAN Custom, erste Version, läuft mit Version 4.20\_eb0.1.1-beta19}
+\subsubsection{WiCAN Custom, erste Revision, mit Version 4.20\_eb0.1.1-beta19}
 \begin{enumerate}
-  \item{Normale MITM-Nutzung:} 40 mA
-  \item{Normale parallele Nutzung:} 34 mA
-  \item{Startvorgang:} bis zu 48 mA
+  \item Normale Nutzung im MITM-Modus: 40 mA
+  \item Normale Nutzung im Parallelmodus: 34 mA
+  \item Startvorgang: bis zu 48 mA
 \end{enumerate}
 
-\subsubsection{WiCAN Pro läuft mit Version 4.50}
+\subsubsection{WiCAN Pro mit Version 4.50}
 \begin{enumerate}
-  \item{Normale Verwendung:} 50 mA
+  \item Normale Verwendung: 50 mA
 \end{enumerate}
 
-\subsubsection{Komma-weißer Panda rennt als letzter Animatronic\_Panda Build}
+\subsubsection{Comma White Panda mit dem letzten animatronic\_panda-Build}
 \begin{enumerate}
-  \item{Normale Verwendung:} 32 mA
+  \item Normale Verwendung: 32 mA
 \end{enumerate}
 
 \subsubsection{vLinker MC+}
 \begin{enumerate}
-  \item{Normaler Gebrauch (ohne Verbindung):} 15-18 mA
-  \item{CarScanner ist über BLE verbunden:} 20-25 mA, Stromspitzen bis zu 60 mA
+  \item Normale Verwendung (ohne Verbindung): 15--18 mA
+  \item CarScanner über BLE verbunden: 20--25 mA, Stromspitzen bis zu 60 mA
 \end{enumerate}
 
-\subsection{Wird es die 12V-Batterie zerstören?}
+\subsection{Entlädt es die 12-V-Batterie?}
 
-WiCAN verfügt über einen Energiesparmodus, den sogenannten Schlafmodus, in dem nahezu alle Funktionen heruntergefahren werden und nur sehr wenig Strom verbraucht wird. Dieser Modus ist normalerweise so konfiguriert, dass er sich anhand der 12-V-Spannung Ihres Fahrzeugs einschaltet. Wenn Sie sich Sorgen um Ihre 12-V-Spannung machen, empfehlen wir Ihnen, diese Funktion zu aktivieren. Sie finden sie in der WiCAN-Benutzeroberfläche unter [Pfad einfügen]. \href{http://192.168.80.1}{http://192.168.80.1} im Tab „Energiesparen“. Weitere Informationen finden Sie hier: \href{https://meatpihq.github.io/wican-fw/config/sleep-mode}{https://meatpihq.github.io/wican-fw/config/sleep-mode}Wir arbeiten aktiv daran, diese Funktion von spannungsbasiert auf CAN-basiert (d. h. auf das Signal „Fahrzeug aus“ achten) umzustellen. 
+WiCAN verfügt über einen Energiesparmodus, den sogenannten Schlafmodus. In diesem werden nahezu alle Funktionen abgeschaltet und nur sehr wenig Strom verbraucht. Der Schlafmodus wird normalerweise abhängig von der 12-V-Spannung Ihres Fahrzeugs aktiviert. Wenn Sie sich Sorgen um die 12-V-Batterie machen, empfehlen wir Ihnen, diese Funktion einzuschalten. Sie finden sie in der WiCAN-Oberfläche unter \href{http://192.168.80.1}{http://192.168.80.1} auf der Registerkarte `Power Saving'. Weitere Informationen finden Sie in der \href{https://meatpihq.github.io/wican-fw/config/sleep-mode}{WiCAN-Dokumentation zum Schlafmodus}. Wir arbeiten daran, diese Funktion künftig CAN-basiert statt spannungsbasiert zu steuern, also beispielsweise auf das Signal `Fahrzeug aus' zu reagieren.
 
-Mit einer neuen 60-Ah-12-V-Batterie würde der typische Stromverbrauch des angepassten WiCAN von 40 mA über 7 Tage betragen. $40 \unit[\mathrm{mA}] * 24 \unit[\mathrm{hours/day}] * 7 \unit[\mathrm{days}] = 6.7 Ah$, was ungefähr 10 entspricht.\% of the 12V state of charge. Unlocked and off, a 2022 Canadian Preferred AWD Ioniq 5 with no aftermarket loads draws about 1.75 A (1750 mA). After ECUs quiet down 5 minutes after locking the car, the draw is still 0.75 A (750 mA). (The car has a further "sleep" mode after 7 days of inactivity; this draw hasn't been measured here.) So, a customized WiCAN in MITM mode and not in sleep mode increases draw over the first 7 days of inactivity by 5\%.
+Bei einer neuen 60 Ah 12-V-Batterie würde ein angepasster WiCAN mit seiner typischen Stromaufnahme von 40 mA über sieben Tage folgende Ladungsmenge verbrauchen: $40\,\mathrm{mA} \times 24\,\mathrm{h/Tag} \times 7\,\mathrm{Tage} = 6{,}7\,\mathrm{Ah}$. Das entspricht etwa 10\% der Kapazität der 12-V-Batterie. Ein entriegelter und ausgeschalteter Ioniq 5 AWD, Baujahr 2022, aus Kanada nimmt ohne zusätzliche Verbraucher etwa 1,75 A (1750 mA) auf. Nachdem die Steuergeräte fünf Minuten nach dem Verriegeln des Fahrzeugs zur Ruhe gekommen sind, beträgt die Stromaufnahme noch 0,75 A (750 mA). Das Fahrzeug verfügt nach sieben Tagen Inaktivität über einen weiteren Schlafmodus; dessen Stromaufnahme wurde hier nicht gemessen. Der modifizierte WiCAN im MITM-Modus, der nicht in den Schlafmodus wechselt, erhöht die Stromaufnahme während der ersten sieben Tage der Inaktivität daher um etwa 5\%.
 
-\subsection{MITM vs. Parallel}
-Wenn der Kabelbaum des Vorkonditionierungskits im MITM-Modus ist und Ihr WiCAN-System in den Schlafmodus wechselt, werden Anfragen an die Hyundai/Kia-App nicht verarbeitet. Langfristig geplant ist die Implementierung eines Teilschlafmodus, der die CAN-Weiterleitung ermöglicht, WLAN jedoch deaktiviert. Wir empfehlen, Ihr WiCAN-System im Schlafmodus mit einer sehr niedrigen Spannung, z. B. 12,3 V, zu betreiben, wenn der Kabelbaum im MITM-Modus ist und Sie Anfragen an die Hyundai/Kia-App nutzen möchten. 
+\subsection{MITM oder Parallelbetrieb?}
+Wenn der Kabelbaum des Vorkonditionierungs-Kits im MITM-Modus betrieben wird und Ihr WiCAN in den Schlafmodus wechselt, werden Daten der Hyundai/Kia-App nicht weitergeleitet. Für die Zukunft planen wir einen partiellen Schlafmodus, der die CAN-Weiterleitung ermöglicht, das WLAN jedoch deaktiviert. Bis dahin empfehlen wir, den Schlafmodus Ihres WiCAN erst bei einer sehr niedrigen Spannung, beispielsweise 12,3 V, zu aktivieren, wenn der Kabelbaum im MITM-Modus betrieben wird und Sie die Steuerung mit der Hyundai/Kia-App nutzen möchten.
 
 \section{Häufig gestellte Fragen}
 \begin{enumerate}
-  \item[Q:] Wie installiere ich es?
-  \item[A:] Siehe die \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/}{Installationsanleitungen}Falls Ihnen das zu kompliziert erscheint, fragen Sie doch einfach einen Teenager in Ihrer Nähe oder einen Car-Audio-Händler um Hilfe!
-  \item[Q:] Warum funktionieren meine Rückfahrkamera, die Auto-App oder andere Funktionen des zentralen Bildschirms nach der Installation nicht?
-  \item[A:] Überprüfen Sie die \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/harnesses/head_unit_MITM/MITM_harness_modes.pdf}{Leitfaden zu den Gurtarten}Wenn Sie ein originales WiCAN-System verwenden oder kein Gerät an den OBD-Anschluss angeschlossen ist, muss der Kabelbaum im Parallelmodus betrieben werden. Bei einem kundenspezifischen WiCAN-System muss der Kabelbaum im MITM-Modus betrieben werden.
-  \item[Q:] Wird mein Auto dadurch leichter gestohlen?
-  \item[A:] Unwahrscheinlich, aber die Installation ist aus verschiedenen Gründen, unter anderem aus Sicherheitsgründen, so konzipiert, dass sie schwer zu erkennen ist. Wir empfehlen Ihnen dringend, Ihr WiCAN-Passwort zu ändern. 
-  \item[Q:] Wird dadurch meine Garantie ungültig?
-  \item[A:] Informieren Sie sich über die Garantie- und Verbraucherschutzgesetze Ihres Landes. In den USA bietet der Magnusson-Moss Warranty Act einen starken Verbraucherschutz. Drohungen von Autoherstellern, dass Zubehörteile aus dem Zubehörhandel die Garantie ungültig machen, sind in vielen Fällen vor Gericht nicht haltbar. (Dies ist keine Rechtsberatung.) Gleichzeitig ist die Fehlerdiagnose durch einen Kfz-Techniker oft schwierig. Wir empfehlen daher dringend, alle Zubehörteile und Teile aus dem Zubehörhandel zu entfernen, die die Diagnose erschweren könnten. Wenn Sie beispielsweise Probleme mit dem Autoradio oder dem USB-Anschluss haben, ist es ratsam, diese Teile vor dem Werkstattbesuch auszubauen, um Komplikationen bei der Diagnose zu vermeiden. 
-  \item[Q:] Welche Konfiguration des Kits wird für die Durchführung einer grundlegenden Wartung meines Autos in der Vertragswerkstatt empfohlen?
-  \item[A:] Wir empfehlen Ihnen, Ihr WiCAN-Gerät vom Stromnetz zu trennen und sicherzustellen, dass Ihr Kabelbaum angeschlossen ist. \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/harnesses/head_unit_MITM/MITM_harness_modes.pdf}{Parallelmodus}.
-  \item[Q:] Was, wenn ich das selbst bauen möchte?
-  \item[A:] Mach es! Alles, was wir getan haben, ist \href{https://github.com/tylerharvey/Ioniq5_CAN}{Open-Source}Sie können den Schaltplan gerne verwenden, um selbst etwas zu bauen. Die Stecker sind auf AliExpress erhältlich. Wenn Sie jedoch einen Beitrag zum öffentlichen Wissen in Form eines Pull Requests an die Community leisten, … \href{https://github.com/dragz/egmpdbc}{DBC-Datei} Oder es gibt andere Möglichkeiten: Es gibt Rabatte, die die Nettokosten auf ein mit DIY-Angeboten konkurrenzfähiges Niveau senken, und das bei deutlich geringerem Arbeitsaufwand.
-  \item[Q:] Warum kann das nicht ein Software-Update sein?
-  \item[A:] Das könnte sein. Wir haben Vermutungen, warum Hyundai/Kia dies nicht in ein Navigationsupdate aufgenommen hat. Wenn Sie wissen, wie… \href{https://discord.gg/zyrngQ5qQ}{Hacke dein Autoradio} und die CAN-Schnittstellenfunktionen gefunden haben, können Sie diese gerne hinzufügen. \href{https://www.reddit.com/r/KiaEV6/comments/1jdd56u/comment/mid9xie/}{eine manuelle Vorkonditionierungstaste an Ihrem Autoradio}Die Verbreitung von manipulierter Firmware ist derzeit jedoch nicht möglich, weshalb ein nachträgliches „Update“ nur schwer flächendeckend verfügbar zu machen wäre.
-  \item[Q:] Kann ich das auf meinem Comma-Gerät implementieren?
-  \item[A:] Wir haben dies getestet und glauben nicht, dass es funktioniert. Anscheinend werden keine Vorkonditionierungsnachrichten von den CAN-Bussen A oder E, an denen sich das Comma-Modul befindet, an die CAN-Busse M oder G weitergeleitet, an denen sich das BMU-Modul befindet.
-  \item[Q:] Wird das meine ICCU zerstören?
-  \item[A:] NEIN.
-  \item[Q:] Kann ich die integrierte Navigation während der Verwendung dieses Kits nutzen?
-  \item[A:] In der Beta-Version ist dies nicht möglich. Dies wird mit dem angepassten WiCAN behoben.
-  \item[Q:] Wird ein Navigationsupdate meine Fähigkeit, das Kit zu nutzen, beeinträchtigen?
-  \item[A:] Es ist höchst unwahrscheinlich, da das Kit nicht auf die Kommunikation mit dem Steuergerät angewiesen ist. Ein Update des Batteriemanagementsystems wäre möglich (beispielsweise das Update, das die Vorkonditionierung bei frühen Ioniq 5-Modellen nachträglich aktivierte), aber wir gehen davon aus, dass solche Updates von Vertragshändlern durchgeführt werden müssen. Eine hundertprozentige Garantie können wir jedoch nicht geben.\% certainty that a navigation update will not affect the functionality of the kit. In the off chance that this does happen, let us know and we will do our best to update logic to restore manual preconditioning functionality.
-  \item[Q:] Warum der Countdown? Warum kann die Vorkonditionierung nicht einfach direkt nach dem Drücken der Taste beginnen?
-  \item[A:] Das Batteriemanagementsystem (das Steuergerät im Akku, das das BMS enthält) verfügt über eine integrierte 60-Sekunden-Wartezeit nach der ersten Vorkonditionierungsanforderung. Wird die Anforderung vor Ablauf dieser 60 Sekunden abgebrochen, startet die Vorkonditionierung nicht. Daher haben wir versucht, diese 60-Sekunden-Wartezeit für den Benutzer deutlich sichtbar und verständlich zu gestalten.
-  \item[Q:] Würdest du mir einen neuen Knopf bauen?
-  \item[A:] Vielleicht! Schreiben Sie uns eine E-Mail an \href{mailto:requests@electroniqbuttons.com}{requests@electronicbuttons.com} mit Ihren Anfragen.
-  \item[Q:] Ihr Geschäft heißt „Electroniq Buttons Boutique“. Wo befinden sich die physischen Knöpfe?
-  \item[A:] Wir arbeiten daran, physische Tasten anzubieten. Roy hat einen getesteten Prototyp, der in seinem Video gezeigt wird. \href{https://github.com/dragz/ironiq}{Ironiq} Repository.
+  \item[Frage:] Wie installiere ich das Kit?
+  \item[Antwort:] Eine Anleitung finden Sie in den \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/}{Installationsanleitungen}. Wenn Ihnen das zu kompliziert erscheint, bitten Sie einfach einen Jugendlichen in Ihrer Nähe oder eine Car-HiFi-Werkstatt um Hilfe!
+  \item[Frage:] Warum funktionieren meine Rückfahrkamera, die Fahrzeug-App oder andere Funktionen des zentralen Bildschirms nach der Installation nicht?
+  \item[Antwort:] Prüfen Sie den \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/harnesses/head_unit_MITM/MITM_harness_modes.pdf}{Leitfaden zu den Kabelbaum-Modi}. Bei einem originalen WiCAN oder wenn kein Gerät am OBD-Anschluss angeschlossen ist, muss der Kabelbaum im Parallelmodus betrieben werden. Bei einem modifizierten WiCAN sollte der Kabelbaum im MITM-Modus betrieben werden.
+  \item[Frage:] Wird mein Fahrzeug dadurch leichter gestohlen?
+  \item[Antwort:] Wahrscheinlich nicht. Die Installation ist aus mehreren Gründen, unter anderem aus Sicherheitsgründen, möglichst unauffällig ausgelegt. Wir empfehlen dringend, das WiCAN-Passwort zu ändern.
+  \item[Frage:] Verliert mein Fahrzeug dadurch seine Garantie?
+  \item[Antwort:] Prüfen Sie die in Ihrem Land geltenden Garantie- und Verbraucherschutzgesetze. In den USA bietet der Magnuson-Moss Warranty Act einen starken Verbraucherschutz. Behauptungen von Autoherstellern, Zubehörteile aus dem Nachrüstmarkt würden automatisch die Garantie erlöschen lassen, haben vor Gericht häufig keinen Bestand. (Dies ist keine Rechtsberatung.) Gleichzeitig kann die Fehlerdiagnose für Kfz-Techniker durch zusätzliche Komponenten erschwert werden. Wir empfehlen daher dringend, Zubehör und Nachrüstteile auszubauen, die die Diagnose erschweren könnten. Wenn beispielsweise Probleme mit der Headunit oder dem USB-Anschluss auftreten, sollten Sie das Kit vor dem Werkstattbesuch ausbauen, um die Diagnose nicht zu erschweren.
+  \item[Frage:] Welche Konfiguration des Kits wird für eine grundlegende Wartung meines Fahrzeugs in der Vertragswerkstatt empfohlen?
+  \item[Antwort:] Trennen Sie das WiCAN von der Stromversorgung und stellen Sie sicher, dass sich der Kabelbaum im \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/harnesses/head_unit_MITM/MITM_harness_modes.pdf}{Parallelmodus} befindet.
+  \item[Frage:] Was ist, wenn ich das Kit selbst nachbauen möchte?
+  \item[Antwort:] Nur zu! Alles, was wir entwickelt haben, ist \href{https://github.com/tylerharvey/Ioniq5_CAN}{Open Source}. Sie können den Schaltplan des Kabelbaums gerne verwenden, um Ihr eigenes Kit zu bauen. Die benötigten Stecker sind auf AliExpress erhältlich. Wenn Sie jedoch in Form eines Pull Requests zur \href{https://github.com/dragz/egmpdbc}{DBC-Datei} oder auf andere Weise zum öffentlichen Wissensstand beitragen, sind Rabatte möglich. Damit sinken die Nettokosten auf ein mit DIY-Angeboten vergleichbares Niveau, bei deutlich geringerem Arbeitsaufwand.
+  \item[Frage:] Warum kann das nicht durch ein Software-Update gelöst werden?
+  \item[Antwort:] Das wäre grundsätzlich möglich. Wir haben Vermutungen, warum Hyundai/Kia diese Funktion nicht in ein Navigationsupdate aufgenommen hat. Wenn Sie wissen, wie man die Headunit hackt und die CAN-Schnittstellenfunktionen findet, können Sie gerne eine \href{https://www.reddit.com/r/KiaEV6/comments/1jdd56u/comment/mid9xie/}{manuelle Vorkonditionierungstaste in die Headunit integrieren}. Die Verteilung manipulierter Firmware ist derzeit jedoch nicht möglich, weshalb ein nachträgliches ``Update'' nur schwer flächendeckend verfügbar gemacht werden könnte.
+  \item[Frage:] Kann ich das auf meinem Comma-Gerät umsetzen?
+  \item[Antwort:] Wir haben das getestet und glauben nicht, dass es funktioniert. Offenbar werden Vorkonditionierungsnachrichten von den CAN-Bussen A oder E, an denen das Comma-Modul angeschlossen ist, nicht an die CAN-Busse M oder G weitergeleitet, an denen sich das BMU befindet.
+  \item[Frage:] Wird dadurch meine ICCU beschädigt?
+  \item[Antwort:] Nein.
+  \item[Frage:] Kann ich während der Nutzung dieses Kits die integrierte Navigation verwenden?
+  \item[Antwort:] Mit der Beta-Version ist das nicht möglich. Diese Einschränkung soll mit dem modifizierten WiCAN behoben werden.
+  \item[Frage:] Könnte ein Navigationsupdate die Möglichkeit einschränken, das Kit zu nutzen?
+  \item[Antwort:] Das ist höchst unwahrscheinlich, da das Kit nicht auf die Kommunikation mit der Headunit angewiesen ist. Ein Update der Batteriemanagementeinheit könnte dies jedoch bewirken, beispielsweise das Update, das die Vorkonditionierung bei frühen Ioniq 5 nachträglich aktiviert hat. Nach unserer Einschätzung müssen solche Updates allerdings von Vertragshändlern durchgeführt werden. Wir können dennoch keine hundertprozentige Sicherheit geben, dass ein Navigationsupdate die Funktion des Kits nicht beeinträchtigt. Sollte dies wider Erwarten passieren, informieren Sie uns bitte. Wir werden unser Bestes tun, die Logik so anzupassen, dass die manuelle Vorkonditionierung wieder funktioniert.
+  \item[Frage:] Warum gibt es den Countdown? Warum beginnt die Vorkonditionierung nicht sofort nach dem Drücken der Taste?
+  \item[Antwort:] Die Batteriemanagementeinheit (das Steuergerät im Akku, das das BMS enthält) hat nach der ersten Vorkonditionierungsanforderung eine integrierte Wartezeit von 60 Sekunden. Wird die Anforderung vor Ablauf dieser 60 Sekunden beendet, startet die Vorkonditionierung nicht. Deshalb machen wir diese Wartezeit für den Benutzer durch den Countdown sichtbar und verständlich.
+  \item[Frage:] Könnt ihr mir einen separaten Vorkonditionierungs-Knopf bauen?
+  \item[Antwort:] Vielleicht! Schreiben Sie uns mit Ihren Wünschen eine E-Mail an \href{mailto:requests@electroniqbuttons.com}{requests@electroniqbuttons.com}.
+  \item[Frage:] Das Unternehmen heißt ``Electroniq Buttons Boutique''. Wo sind die physischen Knöpfe?
+  \item[Antwort:] Wir arbeiten daran, physische Knöpfe anzubieten. Roy hat einen getesteten Prototyp entwickelt, der in seinem \href{https://github.com/dragz/ironiq}{Ironiq-Repository} gezeigt wird.
 \end{enumerate}
 % \begin{figure}[h]
 %   \subfloat[]{\label{subfig:overview:harness}
