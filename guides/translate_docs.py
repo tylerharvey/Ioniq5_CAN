@@ -64,8 +64,30 @@ Quick examples
       ./translate_docs.py --to de --adaptive-example guides/manuals/preconditioning_manual_2a57ad.tex \
           --project my-gcp-project guides/manuals/preconditioning_manual.tex
 
+     # same run, but parameters read from a JSON config file
+      ./translate_docs.py --config translate_de.json guides/manuals/preconditioning_manual.tex
+
 Notes
 -----
+  * Run parameters can be read from a JSON config file with --config. Keys
+    mirror the long option names with dashes turned into underscores, e.g.
+    --adaptive-example becomes "adaptive_example". Any option you pass on the
+    command line overrides the config value; config values act as defaults.
+    For the adaptive example above, translate_de.json could contain:
+
+        {
+          "to": "de",
+          "source": "en",
+          "delay": 0.5,
+          "adaptive_example": "guides/manuals/preconditioning_manual_2a57ad.tex",
+          "project": "my-gcp-project",
+          "location": "us-central1",
+          "access_token_file": "token.gpg"
+        }
+
+    Boolean flags (e.g. "compile", "dry_run") accept true/false, and the
+    source files can be given as "files". A personal config holding access
+    tokens is best kept out of git.
   * Defaults to the free/unofficial endpoint
     https://translate.googleapis.com/translate_a/single?client=gtx
     No API key required; keep --delay modest to avoid rate limits.
@@ -862,6 +884,52 @@ def prepend_tag(ext, text, src, commit):
     return "% translate_docs: {} @ {}\n{}".format(src, commit, text)
 
 
+def _config_defaults(ap):
+    """Map option dest -> the value it has when *not* given on the command
+    line, so a config file can act as defaults without overriding explicit
+    CLI arguments. (argparse reports `None` for nargs='*' actions even though
+    parsing yields `[]`.)"""
+    out = {}
+    for action in ap._actions:
+        dest = action.dest
+        if not dest or dest == "config":
+            continue
+        if action.default is not None:
+            out[dest] = action.default
+        elif action.nargs == argparse.ZERO_OR_MORE:
+            out[dest] = []
+        else:
+            out[dest] = None
+    return out
+
+
+def _load_config(path):
+    """Load and validate a JSON run-parameter file."""
+    try:
+        with open(path, encoding="utf-8") as fh:
+            cfg = json.load(fh)
+    except OSError as exc:
+        raise ValueError("cannot read config {}: {}".format(path, exc)) from exc
+    except json.JSONDecodeError as exc:
+        raise ValueError("config {} is not valid JSON: {}".format(path, exc)) from exc
+    if not isinstance(cfg, dict):
+        raise ValueError("config {} must be a JSON object, not {}".format(
+            path, type(cfg).__name__))
+    return cfg
+
+
+def _apply_config(args, ap, cfg):
+    """Overlay config-file values as defaults; CLI arguments always win."""
+    defaults = _config_defaults(ap)
+    for key, value in cfg.items():
+        if key not in defaults:
+            raise ValueError("unknown config key {!r} (valid: {})".format(
+                key, ", ".join(sorted(defaults))))
+        if getattr(args, key) == defaults[key]:
+            setattr(args, key, value)
+    return args
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(
         description="Translate rendered text in .md/.tex files, preserving "
@@ -870,6 +938,11 @@ def main(argv=None):
         epilog=__doc__)
     ap.add_argument("files", nargs="*", metavar="FILE",
                     help=".md or .tex files to translate")
+    ap.add_argument("--config", metavar="FILE",
+                    help="read run parameters from a JSON config file "
+                         "(keys mirror the long option names, dashes become "
+                         "underscores); explicit command-line options override "
+                         "config values")
     ap.add_argument("-t", "--to", metavar="LANG",
                     help="target language code, e.g. fr, de, es, pt-BR "
                          "(required unless --compile-only)")
@@ -916,6 +989,9 @@ def main(argv=None):
                          "(also $GOOGLE_CLOUD_PROJECT, or gcloud config)")
     ap.add_argument("--location", metavar="LOC", default="us-central1",
                     help="GCP location for Adaptive Translation (default us-central1)")
+    ap.add_argument("--adaptive-model", metavar="MODEL", default=None,
+                    help="Adaptive Translation model to request "
+                         "(default llm)")
     ap.add_argument("--adaptive-dataset", metavar="DATASET",
                     help="existing Adaptive MT dataset resource name "
                          "projects/PROJECT/locations/LOC/adaptiveMtDatasets/ID; "
@@ -927,6 +1003,14 @@ def main(argv=None):
                     help="GPG-encrypted file containing OAuth access token; "
                          "decrypted with `gpg -d FILE`")
     args = ap.parse_args(argv)
+
+    if args.config:
+        try:
+            cfg = _load_config(args.config)
+            args = _apply_config(args, ap, cfg)
+        except ValueError as exc:
+            ap.error(str(exc))
+        print("using config file: {}".format(args.config))
 
     files = args.files
     if args.all:
@@ -1052,7 +1136,7 @@ def main(argv=None):
             "project": project,
             "location": args.location,
             "dataset": dataset,
-            "model": "llm",
+            "model": args.adaptive_model or "llm",
             "reference_pairs": reference_pairs,
             "access_token": access_token,
         }
@@ -1060,8 +1144,9 @@ def main(argv=None):
             print(f"using Google Adaptive Translation dataset {dataset} in {args.location}")
         else:
             assert reference_pairs is not None  # extracted above
-            print(f"using Google Adaptive Translation (LLM) with {len(reference_pairs)} reference pairs "
-                  f"from {args.adaptive_example} (project {project}, {args.location})")
+            print(f"using Google Adaptive Translation (model {args.adaptive_model or 'llm'}) with "
+                  f"{len(reference_pairs)} reference pairs from {args.adaptive_example} "
+                  f"(project {project}, {args.location})")
 
     for src in files:
         dst = out_path(src, args.to, args.out_dir)
