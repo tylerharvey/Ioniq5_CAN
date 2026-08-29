@@ -58,7 +58,11 @@ Quick examples
      ./translate_docs.py --compile-only --all
 
      # see what would be done without calling Google
-     ./translate_docs.py --to nl --dry-run guides/manuals/preconditioning_manual.tex
+      ./translate_docs.py --to nl --dry-run guides/manuals/preconditioning_manual.tex
+
+     # adaptive translation using a hand-polished example for German
+      ./translate_docs.py --to de --adaptive-example guides/manuals/preconditioning_manual_2a57ad.tex \
+          --project my-gcp-project guides/manuals/preconditioning_manual.tex
 
 Notes
 -----
@@ -75,6 +79,18 @@ Notes
     --api-key-file decrypts the key with `gpg -d FILE`, keeping it out of
     shell history. The paid endpoint has higher rate limits and counts against
     your billing quota.
+  * With --adaptive-example and --project, the Google Cloud Translation
+    Adaptive MT (LLM) endpoint
+    https://translation.googleapis.com/v3/projects/PROJECT/locations/LOCATION:adaptiveMtTranslate
+    is used. The script extracts reference sentence pairs from the example
+    pair (e.g. guides/manuals/preconditioning_manual_2a57ad.tex and its
+    .de.tex hand-polished German translation for --to de) and sends the
+    5 most relevant pairs per request to tailor the translation. Requires a
+    GCP project and OAuth token (--access-token, $GOOGLE_OAUTH_ACCESS_TOKEN,
+    or `gcloud auth print-access-token`). For the German translation the
+    preconditioning_manual_2a57ad.* pair is the recommended example; inline
+    reference pairs are used (no dataset creation needed), or specify
+    --adaptive-dataset for a pre-created dataset.
   * Originals are never modified: output is written to
     basename.<lang><ext> next to the source (or into --out-dir).
   * Change detection: each translated output embeds a comment tagging the
@@ -120,6 +136,270 @@ BABEL = {
     "fi": "finnish", "cs": "czech", "tr": "turkish", "ro": "romanian",
     "el": "greek", "hu": "hungarian",
 }
+
+# ---------------------------------------------------------------------------
+# Adaptive translation helpers (Google Cloud Translation Adaptive MT)
+# ---------------------------------------------------------------------------
+
+def _words(text):
+    return re.findall(r"[A-Za-z]+", text.lower())
+
+
+def _normalize(text):
+    return re.sub(r"\s+", " ", text).strip().lower()
+
+
+def _sim(a, b):
+    A, B = set(_words(a)), set(_words(b))
+    if not A or not B:
+        return 0.0
+    return 2.0 * len(A & B) / (len(A) + len(B))
+
+
+def _align_units(a, b, sim=_sim):
+    n, m = len(a), len(b)
+    gap, neg = -0.9, -1e9
+    dp = [[neg] * (m + 1) for _ in range(n + 1)]
+    for i in range(n + 1):
+        dp[i][0] = i * gap
+    for j in range(m + 1):
+        dp[0][j] = j * gap
+    for i in range(1, n + 1):
+        for j in range(1, m + 1):
+            dp[i][j] = max(dp[i - 1][j - 1] + sim(a[i - 1], b[j - 1]),
+                           dp[i - 1][j] + gap, dp[i][j - 1] + gap)
+    i, j, pairs = n, m, []
+    while i > 0 or j > 0:
+        if i > 0 and j > 0 and dp[i][j] == dp[i - 1][j - 1] + sim(a[i - 1], b[j - 1]):
+            pairs.append((i - 1, j - 1))
+            i, j = i - 1, j - 1
+        elif i > 0 and dp[i][j] == dp[i - 1][j] + gap:
+            pairs.append((i - 1, None))
+            i -= 1
+        else:
+            pairs.append((None, j - 1))
+            j -= 1
+    pairs.reverse()
+    return pairs
+
+
+def _body_blocks(text):
+    start = text.find("\\begin{document}")
+    body = text[start:] if start != -1 else text
+    return [b for b in re.split(r"\n[ \t]*\n", body) if b.strip()]
+
+
+def _pure_sentences(block, rules):
+    """Extract pure-text sentences from a block (markup stripped)."""
+    prot = Protector()
+    protected = prot.protect(block, rules)
+    parts = re.split(r"([\ue000-\uf8ff]+)", protected)
+    sents = []
+    for part in parts:
+        if not part or PUA_RE.fullmatch(part) or not _has_letters(part):
+            continue
+        core = part.strip()
+        for s in re.split(r"(?<=[.!?])\s+", core):
+            s = s.strip()
+            if s and _has_letters(s):
+                sents.append(s)
+    return sents
+
+
+def _extract_reference_pairs(src_path, tgt_path, rules):
+    src_text = open(src_path, encoding="utf-8").read()
+    tgt_text = open(tgt_path, encoding="utf-8").read()
+    if rules is TEX_RULES:
+        src_blocks = _body_blocks(src_text)
+        tgt_blocks = _body_blocks(tgt_text)
+    else:
+        src_blocks = [b.strip() for b in re.split(r"\n[ \t]*\n", src_text) if b.strip()]
+        tgt_blocks = [b.strip() for b in re.split(r"\n[ \t]*\n", tgt_text) if b.strip()]
+    pairs = []
+    for s_blk, t_blk in zip(src_blocks, tgt_blocks):
+        s_sents = _pure_sentences(s_blk, rules)
+        t_sents = _pure_sentences(t_blk, rules)
+        if not s_sents or not t_sents:
+            continue
+        aligned = _align_units(s_sents, t_sents)
+        groups = []
+        cur = None
+        for ai, bi in aligned:
+            if ai is not None:
+                cur = ai
+                groups.append([ai, []])
+            if bi is not None and cur is not None:
+                groups[-1][1].append(bi)
+        for ai, bi_list in groups:
+            if not bi_list:
+                continue
+            s_raw = s_sents[ai].strip()
+            t_raw = " ".join(t_sents[bi].strip() for bi in bi_list)
+            if not s_raw or not t_raw:
+                continue
+            if len(s_raw) + len(t_raw) > 512 or len(s_raw) > 400 or len(t_raw) > 400:
+                continue
+            pairs.append((s_raw, t_raw))
+    # Fallback: if too few, try line-level pure sentences
+    if len(pairs) < 5:
+        for s_blk, t_blk in zip(src_blocks, tgt_blocks):
+            sp, tp = Protector(), Protector()
+            s_lines = [p.strip() for p in sp.protect(s_blk, rules).split("\n") if p.strip() and _has_letters(p)]
+            t_lines = [p.strip() for p in tp.protect(t_blk, rules).split("\n") if p.strip() and _has_letters(p)]
+            # Map protected lines back to pure text for pairing
+            s_pure = []
+            for ln in s_lines:
+                # ln is protected line, get pure text by stripping PUA
+                pure = PUA_RE.sub(" ", ln).strip()
+                pure = re.sub(r"\s+", " ", pure)
+                if pure and _has_letters(ln):
+                    s_pure.append(pure)
+            t_pure = []
+            for ln in t_lines:
+                pure = PUA_RE.sub(" ", ln).strip()
+                pure = re.sub(r"\s+", " ", pure)
+                if pure and _has_letters(ln):
+                    t_pure.append(pure)
+            aligned = _align_units(s_pure, t_pure)
+            groups = []
+            cur = None
+            for ai, bi in aligned:
+                if ai is not None:
+                    cur = ai
+                    groups.append([ai, []])
+                if bi is not None and cur is not None:
+                    groups[-1][1].append(bi)
+            for ai, bi_list in groups:
+                s_raw = s_pure[ai]
+                t_raw = " ".join(t_pure[bi] for bi in bi_list)
+                if s_raw and t_raw and len(s_raw) + len(t_raw) <= 512:
+                    key = _normalize(s_raw)
+                    if key not in { _normalize(p[0]) for p in pairs }:
+                        pairs.append((s_raw, t_raw))
+    return pairs
+
+
+def _select_reference_pairs(query, pairs, k=5):
+    scored = []
+    for src, tgt in pairs:
+        scored.append((_sim(query, src), src, tgt))
+    scored.sort(key=lambda x: -x[0])
+    top = [(s, t) for _, s, t in scored[:k] if _sim(query, s) > 0 or True]
+    # Always return at least min(k, len(pairs)) even if similarity low
+    return top[:k]
+
+
+def _get_access_token(explicit=None):
+    if explicit:
+        if os.path.isfile(explicit):
+            try:
+                with open(explicit, encoding="utf-8") as fh:
+                    tok = fh.read().strip()
+                    if tok:
+                        return tok
+            except Exception:
+                pass
+        tok = explicit.strip()
+        if tok:
+            return tok
+    for env in ("GOOGLE_OAUTH_ACCESS_TOKEN", "GOOGLE_CLOUD_ACCESS_TOKEN", "GCLOUD_ACCESS_TOKEN"):
+        tok = os.environ.get(env)
+        if tok:
+            return tok.strip()
+    for cmd in (["gcloud", "auth", "print-access-token"],
+                ["gcloud", "auth", "application-default", "print-access-token"]):
+        try:
+            res = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+            if res.returncode == 0 and res.stdout.strip():
+                return res.stdout.strip()
+        except Exception:
+            continue
+    return None
+
+
+def _get_gcp_project(explicit=None):
+    if explicit:
+        return explicit.strip()
+    for env in ("GOOGLE_CLOUD_PROJECT", "GCLOUD_PROJECT", "GCP_PROJECT", "GOOGLE_PROJECT_ID", "GOOGLE_CLOUD_PROJECT_ID"):
+        v = os.environ.get(env)
+        if v:
+            return v.strip()
+    try:
+        res = subprocess.run(["gcloud", "config", "get-value", "project"],
+                             capture_output=True, text=True, timeout=10)
+        if res.returncode == 0 and res.stdout.strip() and res.stdout.strip() != "(unset)":
+            return res.stdout.strip()
+    except Exception:
+        pass
+    return None
+
+
+def _adaptive_gtx(text, source, target, adaptive_cfg, reference_pairs=None):
+    project = adaptive_cfg.get("project")
+    location = adaptive_cfg.get("location", "us-central1")
+    dataset = adaptive_cfg.get("dataset")
+    access_token = adaptive_cfg.get("access_token")
+    if not project or not access_token:
+        raise RuntimeError("adaptive translation requires --project and OAuth access token (via --access-token, $GOOGLE_OAUTH_ACCESS_TOKEN, or gcloud auth)")
+    parent = f"projects/{project}/locations/{location}"
+    url = f"https://translation.googleapis.com/v3/{parent}:adaptiveMtTranslate"
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Content-Type": "application/json; charset=utf-8",
+        "User-Agent": HEADERS["User-Agent"],
+        "x-goog-user-project": project,
+    }
+    if dataset:
+        # Expand short dataset ID to full resource name if needed
+        if "/" not in dataset:
+            dataset = f"{parent}/adaptiveMtDatasets/{dataset}"
+        body = {"dataset": dataset, "content": [text]}
+    else:
+        if reference_pairs is None:
+            reference_pairs = adaptive_cfg.get("reference_pairs") or []
+            # Select top 5 most relevant for this chunk
+            reference_pairs = _select_reference_pairs(text, reference_pairs, k=5)
+        # Google requires source/target language codes in referenceSentenceConfig
+        src_code = source if source != "auto" else "en"
+        body = {
+            "referenceSentenceConfig": {
+                "referenceSentencePairLists": [
+                    {"referenceSentencePairs": [
+                        {"sourceSentence": s, "targetSentence": t}
+                        for s, t in reference_pairs
+                    ]}
+                ],
+                "sourceLanguageCode": src_code,
+                "targetLanguageCode": target,
+            },
+            "content": [text],
+        }
+    last = None
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        try:
+            data = json.dumps(body).encode("utf-8")
+            req = urllib.request.Request(url, data=data, headers=headers, method="POST")
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                resp_data = json.loads(resp.read().decode("utf-8"))
+            # Response: {"translations": [{"translatedText": "..."}]}
+            if "translations" in resp_data and resp_data["translations"]:
+                return resp_data["translations"][0].get("translatedText", "")
+            # Fallback for other shapes
+            if "adaptiveMtTranslations" in resp_data:
+                return resp_data["adaptiveMtTranslations"][0].get("translatedText", "")
+            return resp_data.get("translatedText", "") or json.dumps(resp_data)
+        except Exception as exc:  # noqa: BLE001
+            last = exc
+            # Try to parse error body for diagnostics (HTTPError has .read())
+            try:
+                read = getattr(exc, "read", None)
+                if callable(read):
+                    err = read().decode("utf-8", errors="ignore")  # type: ignore[attr-defined]
+                    last = f"{exc} :: {err}"  # type: ignore[assignment]
+            except Exception:
+                pass
+            time.sleep(1.0 * attempt)
+    raise RuntimeError(f"Adaptive translation request failed: {last}")
 
 MD_RULES = [
     (r"`[^`\n]+`", re.M),                      # inline code
@@ -244,11 +524,17 @@ def _split(text):
     return pieces
 
 
-def translate(text, source, target, delay, api_key=None):
+def translate(text, source, target, delay, api_key=None, adaptive_cfg=None):
     pieces = _split(text)
     out = []
     for i, piece in enumerate(pieces):
-        out.append(gtx(piece, source, target, api_key=api_key))
+        if adaptive_cfg is not None:
+            # Select reference pairs most relevant to this piece
+            ref_pairs = adaptive_cfg.get("reference_pairs") or []
+            sel = _select_reference_pairs(piece, ref_pairs, k=5) if ref_pairs and not adaptive_cfg.get("dataset") else None
+            out.append(_adaptive_gtx(piece, source, target, adaptive_cfg, reference_pairs=sel))
+        else:
+            out.append(gtx(piece, source, target, api_key=api_key))
         if i < len(pieces) - 1:
             time.sleep(delay)
     return " ".join(out)
@@ -258,7 +544,7 @@ def _has_letters(text):
     return re.search(r"[^\W\d_]", PUA_RE.sub("", text)) is not None
 
 
-def translate_spans(protected, source, target, delay, api_key=None):
+def translate_spans(protected, source, target, delay, api_key=None, adaptive_cfg=None):
     """Translate only the pure-text spans of a protected block. Protected
     (PUA-placeholder) spans and punctuation-only spans are kept verbatim, so
     Google never sees markup and cannot drop or reorder it."""
@@ -274,11 +560,11 @@ def translate_spans(protected, source, target, delay, api_key=None):
             trail = part[len(part.rstrip()):]
             core = part.strip()
             out.append(lead + translate(core, source, target, delay,
-                                        api_key=api_key) + trail)
+                                        api_key=api_key, adaptive_cfg=adaptive_cfg) + trail)
     return "".join(out)
 
 
-def translate_block(block, rules, source, target, delay, api_key=None):
+def translate_block(block, rules, source, target, delay, api_key=None, adaptive_cfg=None):
     """Protect, translate, restore one block. Falls back to per-line
     translation if Google collapses/expands the number of newlines."""
     prot = Protector()
@@ -286,13 +572,14 @@ def translate_block(block, rules, source, target, delay, api_key=None):
     if not _has_letters(protected):
         return block
     translated = translate_spans(protected, source, target, delay,
-                                 api_key=api_key)
+                                 api_key=api_key, adaptive_cfg=adaptive_cfg)
     if translated.count("\n") != block.count("\n"):
         lines = []
         for line in block.split("\n"):
             p = Protector()
             t = p.restore(translate_spans(p.protect(line, rules), source,
-                                          target, delay, api_key=api_key))
+                                          target, delay, api_key=api_key,
+                                          adaptive_cfg=adaptive_cfg))
             lines.append(t)
             time.sleep(delay)
         translated = "\n".join(lines)
@@ -401,7 +688,7 @@ def patch_babel(tex_text, lang):
 
 
 def translate_markdown(text, source, target, delay, update_anchors=True,
-                       api_key=None):
+                       api_key=None, adaptive_cfg=None):
     blocks = re.split(r"\n[ \t]*\n", text)
     headings, trans_texts, out = [], [], []
     for bi, block in enumerate(blocks):
@@ -411,7 +698,7 @@ def translate_markdown(text, source, target, delay, update_anchors=True,
             continue
         hl = heading_lines(block)
         translated = translate_block(block, MD_RULES, source, target, delay,
-                                     api_key=api_key)
+                                     api_key=api_key, adaptive_cfg=adaptive_cfg)
         out.append(translated)
         if hl:
             for line_no, _, orig_text in hl:
@@ -429,14 +716,15 @@ def translate_markdown(text, source, target, delay, update_anchors=True,
 
 
 def translate_tex(text, source, target, delay, patch_babel_flag=True,
-                  api_key=None):
+                  api_key=None, adaptive_cfg=None):
     marker = "\\begin{document}"
     start = text.find(marker)
     if start == -1:
         raise ValueError("no \\begin{document} found (is this a .tex file?)")
     body = text[start:]
     body = "\n\n".join(
-        translate_block(b, TEX_RULES, source, target, delay, api_key=api_key)
+        translate_block(b, TEX_RULES, source, target, delay, api_key=api_key,
+                        adaptive_cfg=adaptive_cfg)
         for b in re.split(r"\n[ \t]*\n", body))
     result = text[:start] + body
     if patch_babel_flag:
@@ -609,6 +897,29 @@ def main(argv=None):
                          "files like manual.fr.tex)")
     ap.add_argument("--dry-run", action="store_true",
                     help="list inputs/outputs without calling Google Translate")
+    ap.add_argument("--adaptive-example", metavar="FILE",
+                    help="translate adaptively using Google Cloud Translation "
+                         "Adaptive MT: FILE is the source-language document "
+                         "and FILE.<lang><ext> (e.g. preconditioning_manual_"
+                         "2a57ad.de.tex for --to de) is its reference "
+                         "translation. Requires --project and OAuth token. "
+                         "For --to de this uses guides/manuals/preconditioning"
+                         "_manual_2a57ad.* as the hand-polished German example.")
+    ap.add_argument("--project", metavar="PROJECT",
+                    help="GCP project ID/number for Adaptive Translation "
+                         "(also $GOOGLE_CLOUD_PROJECT, or gcloud config)")
+    ap.add_argument("--location", metavar="LOC", default="us-central1",
+                    help="GCP location for Adaptive Translation (default us-central1)")
+    ap.add_argument("--adaptive-dataset", metavar="DATASET",
+                    help="existing Adaptive MT dataset resource name "
+                         "projects/PROJECT/locations/LOC/adaptiveMtDatasets/ID; "
+                         "if given, --adaptive-example is ignored for dataset mode")
+    ap.add_argument("--access-token", metavar="TOKEN",
+                    help="OAuth access token for Adaptive Translation "
+                         "(also $GOOGLE_OAUTH_ACCESS_TOKEN or gcloud auth)")
+    ap.add_argument("--access-token-file", metavar="FILE",
+                    help="GPG-encrypted file containing OAuth access token; "
+                         "decrypted with `gpg -d FILE`")
     args = ap.parse_args(argv)
 
     files = args.files
@@ -666,6 +977,86 @@ def main(argv=None):
     if api_key:
         print("using paid Google Cloud Translation API v2")
 
+    # ---- Adaptive Translation (Google Cloud Adaptive MT) -----------------
+    adaptive_cfg = None
+    if args.adaptive_example or args.adaptive_dataset:
+        if not args.to:
+            ap.error("--adaptive-example/--adaptive-dataset requires -t/--to")
+        project = _get_gcp_project(args.project)
+        access_token = _get_access_token(args.access_token)
+        if args.access_token_file and not access_token:
+            try:
+                res = subprocess.run(["gpg", "-d", args.access_token_file],
+                                     capture_output=True, text=True, check=True)
+                access_token = res.stdout.strip()
+            except FileNotFoundError:
+                ap.error("gpg not found on PATH (needed for --access-token-file)")
+            except subprocess.CalledProcessError as exc:
+                ap.error("gpg -d {} failed: {}".format(
+                    args.access_token_file, exc.stderr.strip() or exc))
+        dataset = args.adaptive_dataset
+        reference_pairs = None
+        if dataset and args.adaptive_example:
+            print("note: --adaptive-dataset given, ignoring --adaptive-example for dataset selection",
+                  file=sys.stderr)
+        if not dataset and args.adaptive_example:
+            ext = os.path.splitext(args.adaptive_example)[1].lower()
+            if ext not in (".md", ".tex"):
+                ap.error("--adaptive-example must be a .md or .tex file")
+            if not os.path.isfile(args.adaptive_example):
+                ap.error("--adaptive-example file not found: {}".format(args.adaptive_example))
+            # Derive target example via same naming as out_path
+            example_tgt = out_path(args.adaptive_example, args.to, None)
+            # Also try literal pattern preconditioning_manual_2a57ad.* handling:
+            # if user passes ..._2a57ad.tex, the derived .de.tex should exist
+            if not os.path.isfile(example_tgt):
+                ap.error("--adaptive-example target not found: {} (expected {} for --to {})".format(
+                    example_tgt, example_tgt, args.to))
+            rules = TEX_RULES if ext == ".tex" else MD_RULES
+            reference_pairs = _extract_reference_pairs(args.adaptive_example, example_tgt, rules)
+            if not reference_pairs:
+                ap.error("no reference pairs extracted from {} -> {}".format(
+                    args.adaptive_example, example_tgt))
+            if len(reference_pairs) < 5:
+                print(f"warning: only {len(reference_pairs)} reference pairs extracted (need >=5 for best results)",
+                      file=sys.stderr)
+            print(f"adaptive translation: extracted {len(reference_pairs)} reference pairs from "
+                   f"{args.adaptive_example} -> {example_tgt}")
+        # For --dry-run no API call is made, so token/project are not strictly required
+        if not args.dry_run:
+            if not project:
+                ap.error("adaptive translation requires --project (or $GOOGLE_CLOUD_PROJECT / gcloud config)")
+            if not access_token:
+                ap.error("adaptive translation requires OAuth token (--access-token, $GOOGLE_OAUTH_ACCESS_TOKEN, or gcloud auth login)")
+        else:
+            if not project:
+                print("note: --dry-run without --project, would require --project for real translation",
+                      file=sys.stderr)
+            if not access_token:
+                print("note: --dry-run without access token, would require OAuth token for real translation",
+                      file=sys.stderr)
+            # Use dummy token for dry-run path (no network)
+            if not access_token:
+                access_token = "dry-run-token"
+            if not project:
+                project = "dry-run-project"
+        if dataset and "/" not in dataset:
+            # Expand short ID
+            dataset = f"projects/{project}/locations/{args.location}/adaptiveMtDatasets/{dataset}"
+        adaptive_cfg = {
+            "project": project,
+            "location": args.location,
+            "dataset": dataset,
+            "reference_pairs": reference_pairs,
+            "access_token": access_token,
+        }
+        if dataset:
+            print(f"using Google Adaptive Translation dataset {dataset} in {args.location}")
+        else:
+            assert reference_pairs is not None  # extracted above
+            print(f"using Google Adaptive Translation (LLM) with {len(reference_pairs)} reference pairs "
+                  f"from {args.adaptive_example} (project {project}, {args.location})")
+
     for src in files:
         dst = out_path(src, args.to, args.out_dir)
         ext = os.path.splitext(src)[1].lower()
@@ -693,11 +1084,13 @@ def main(argv=None):
             result = translate_markdown(content, args.source, args.to,
                                         args.delay,
                                         update_anchors=not args.no_anchors,
-                                        api_key=api_key)
+                                        api_key=api_key,
+                                        adaptive_cfg=adaptive_cfg)
         else:
             result = translate_tex(content, args.source, args.to, args.delay,
                                    patch_babel_flag=not args.no_babel,
-                                   api_key=api_key)
+                                   api_key=api_key,
+                                   adaptive_cfg=adaptive_cfg)
         commit = git_commit_of(src)
         if commit:
             result = prepend_tag(ext, result, src, commit)
