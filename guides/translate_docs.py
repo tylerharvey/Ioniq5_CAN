@@ -82,11 +82,13 @@ Notes
   * With --adaptive-example and --project, the Google Cloud Translation
     Adaptive MT (LLM) endpoint
     https://translation.googleapis.com/v3/projects/PROJECT/locations/LOCATION:adaptiveMtTranslate
-    is used. The script extracts reference sentence pairs from the example
-    pair (e.g. guides/manuals/preconditioning_manual_2a57ad.tex and its
-    .de.tex hand-polished German translation for --to de) and sends the
-    5 most relevant pairs per request to tailor the translation. Requires a
-    GCP project and OAuth token (--access-token, $GOOGLE_OAUTH_ACCESS_TOKEN,
+    is used. The request pins model=llm (the LLM-based adaptive translation
+    model) and carries the reference sentence pairs. The script extracts
+    reference sentence pairs from the example pair (e.g.
+    guides/manuals/preconditioning_manual_2a57ad.tex and its .de.tex
+    hand-polished German translation for --to de) and sends the 5 most
+    relevant pairs per request to tailor the translation. Requires a GCP
+    project and OAuth token (--access-token, $GOOGLE_OAUTH_ACCESS_TOKEN,
     or `gcloud auth print-access-token`). For the German translation the
     preconditioning_manual_2a57ad.* pair is the recommended example; inline
     reference pairs are used (no dataset creation needed), or specify
@@ -189,20 +191,25 @@ def _body_blocks(text):
     return [b for b in re.split(r"\n[ \t]*\n", body) if b.strip()]
 
 
+_ABBREV_RE = re.compile(
+    r"\b(?:Fig|Abb|e\.g|i\.e|etc|vs|Dr|Mr|Ms|No|cf|et al)\.")
+
+
 def _pure_sentences(block, rules):
-    """Extract pure-text sentences from a block (markup stripped)."""
+    """Extract pure-text sentences from a block (markup stripped).
+
+    Protected spans are elided to a single space so they never split a
+    sentence into fragments, and known abbreviations (Fig., e.g., ...) are
+    guarded so they are not mistaken for sentence boundaries."""
     prot = Protector()
     protected = prot.protect(block, rules)
-    parts = re.split(r"([\ue000-\uf8ff]+)", protected)
+    pure = re.sub(r"\s+", " ", PUA_RE.sub(" ", protected)).strip()
+    pure = _ABBREV_RE.sub(lambda m: m.group(0)[:-1] + "\u00b7", pure)
     sents = []
-    for part in parts:
-        if not part or PUA_RE.fullmatch(part) or not _has_letters(part):
-            continue
-        core = part.strip()
-        for s in re.split(r"(?<=[.!?])\s+", core):
-            s = s.strip()
-            if s and _has_letters(s):
-                sents.append(s)
+    for s in re.split(r"(?<=[.!?])\s+", pure):
+        s = s.replace("\u00b7", ".").strip()
+        if s and _has_letters(s):
+            sents.append(s)
     return sents
 
 
@@ -280,13 +287,10 @@ def _extract_reference_pairs(src_path, tgt_path, rules):
 
 
 def _select_reference_pairs(query, pairs, k=5):
-    scored = []
-    for src, tgt in pairs:
-        scored.append((_sim(query, src), src, tgt))
-    scored.sort(key=lambda x: -x[0])
-    top = [(s, t) for _, s, t in scored[:k] if _sim(query, s) > 0 or True]
+    scored = sorted(((_sim(query, src), src, tgt) for src, tgt in pairs),
+                    key=lambda x: -x[0])
     # Always return at least min(k, len(pairs)) even if similarity low
-    return top[:k]
+    return [(s, t) for _, s, t in scored[:k]]
 
 
 def _get_access_token(explicit=None):
@@ -349,11 +353,12 @@ def _adaptive_gtx(text, source, target, adaptive_cfg, reference_pairs=None):
         "User-Agent": HEADERS["User-Agent"],
         "x-goog-user-project": project,
     }
+    model = adaptive_cfg.get("model", "llm")
     if dataset:
         # Expand short dataset ID to full resource name if needed
         if "/" not in dataset:
             dataset = f"{parent}/adaptiveMtDatasets/{dataset}"
-        body = {"dataset": dataset, "content": [text]}
+        body = {"model": model, "dataset": dataset, "content": [text]}
     else:
         if reference_pairs is None:
             reference_pairs = adaptive_cfg.get("reference_pairs") or []
@@ -362,6 +367,7 @@ def _adaptive_gtx(text, source, target, adaptive_cfg, reference_pairs=None):
         # Google requires source/target language codes in referenceSentenceConfig
         src_code = source if source != "auto" else "en"
         body = {
+            "model": model,
             "referenceSentenceConfig": {
                 "referenceSentencePairLists": [
                     {"referenceSentencePairs": [
@@ -1006,9 +1012,8 @@ def main(argv=None):
             if not os.path.isfile(args.adaptive_example):
                 ap.error("--adaptive-example file not found: {}".format(args.adaptive_example))
             # Derive target example via same naming as out_path
+            # (preconditioning_manual_2a57ad.tex -> .de.tex for --to de)
             example_tgt = out_path(args.adaptive_example, args.to, None)
-            # Also try literal pattern preconditioning_manual_2a57ad.* handling:
-            # if user passes ..._2a57ad.tex, the derived .de.tex should exist
             if not os.path.isfile(example_tgt):
                 ap.error("--adaptive-example target not found: {} (expected {} for --to {})".format(
                     example_tgt, example_tgt, args.to))
@@ -1047,6 +1052,7 @@ def main(argv=None):
             "project": project,
             "location": args.location,
             "dataset": dataset,
+            "model": "llm",
             "reference_pairs": reference_pairs,
             "access_token": access_token,
         }
