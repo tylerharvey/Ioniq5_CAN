@@ -17,6 +17,8 @@ Workflow — prefer --config for complex/adaptive runs
 Full endpoint, config, and change-detection details in guides/README.md.
 """
 
+# This is a slopfest. I'd like to edit it down to something I can maintain, but it's low on the list of priorities.
+
 import argparse
 import html
 import json
@@ -280,6 +282,61 @@ def _adaptive_gtx(text, source, target, adaptive_cfg, reference_pairs=None):
             time.sleep(1.0 * attempt)
     raise RuntimeError(f"Adaptive translation request failed: {last}")
 
+
+def _v3_gtx(text, source, target, v3_cfg):
+    """Translate via the v3 API without adaptive reference (plain translate_text)."""
+    project = v3_cfg.get("project")
+    location = v3_cfg.get("location", "us-central1")
+    model = v3_cfg.get("model")
+    if not project:
+        raise RuntimeError("v3 translation requires --project (or $GOOGLE_CLOUD_PROJECT / gcloud config)")
+    parent = f"projects/{project}/locations/{location}"
+    client = translate_v3.TranslationServiceClient()
+    # Expand model shorthand to full resource path if needed
+    model_path = None
+    if model:
+        if model.startswith("projects/"):
+            model_path = model
+        else:
+            # map common shorthands
+            if model == "llm":
+                model = "general/translation-llm"
+            elif model == "nmt":
+                model = "general/nmt"
+            # ensure it contains a slash; if bare like "general", prefix
+            if "/" not in model:
+                model = f"general/{model}"
+            model_path = f"{parent}/models/{model}"
+    kwargs = dict(
+        parent=parent,
+        contents=[text],
+        target_language_code=target,
+    )
+    # v3 auto-detect fails on short fragments (PUA-stripped spans), so default
+    # to "en" when source is "auto" — mirrors _adaptive_gtx behaviour.
+    kwargs["source_language_code"] = source if source != "auto" else "en"
+    if model_path:
+        kwargs["model"] = model_path
+    last = None
+    for attempt in range(1, MAX_ATTEMPTS + 1):
+        try:
+            response = client.translate_text(**kwargs)
+            if response.translations:
+                return response.translations[0].translated_text
+            return ""
+        except Exception as exc:  # noqa: BLE001
+            # Fallback for stray auto-detect cases: if we somehow sent "auto"
+            # or the model still triggers detection failure, retry as "en".
+            msg = str(exc)
+            if "Language detection failed" in msg and kwargs.get("source_language_code") != "en":
+                kwargs["source_language_code"] = "en"
+                last = exc
+                continue
+            last = exc
+            time.sleep(1.0 * attempt)
+    raise RuntimeError(f"v3 translation request failed: {last}")
+
+
 MD_RULES = [
     (r"`[^`\n]+`", re.M),                      # inline code
     (r"<[^>\n]+>", re.M),                      # html tags
@@ -403,7 +460,7 @@ def _split(text):
     return pieces
 
 
-def translate(text, source, target, delay, api_key=None, adaptive_cfg=None):
+def translate(text, source, target, delay, api_key=None, adaptive_cfg=None, v3_cfg=None):
     pieces = _split(text)
     out = []
     for i, piece in enumerate(pieces):
@@ -412,6 +469,8 @@ def translate(text, source, target, delay, api_key=None, adaptive_cfg=None):
             ref_pairs = adaptive_cfg.get("reference_pairs") or []
             sel = _select_reference_pairs(piece, ref_pairs, k=5) if ref_pairs and not adaptive_cfg.get("dataset") else None
             out.append(_adaptive_gtx(piece, source, target, adaptive_cfg, reference_pairs=sel))
+        elif v3_cfg is not None:
+            out.append(_v3_gtx(piece, source, target, v3_cfg))
         else:
             out.append(gtx(piece, source, target, api_key=api_key))
         if i < len(pieces) - 1:
@@ -423,7 +482,7 @@ def _has_letters(text):
     return re.search(r"[^\W\d_]", PUA_RE.sub("", text)) is not None
 
 
-def translate_spans(protected, source, target, delay, api_key=None, adaptive_cfg=None):
+def translate_spans(protected, source, target, delay, api_key=None, adaptive_cfg=None, v3_cfg=None):
     """Translate only the pure-text spans of a protected block. Protected
     (PUA-placeholder) spans and punctuation-only spans are kept verbatim, so
     Google never sees markup and cannot drop or reorder it."""
@@ -439,11 +498,11 @@ def translate_spans(protected, source, target, delay, api_key=None, adaptive_cfg
             trail = part[len(part.rstrip()):]
             core = part.strip()
             out.append(lead + translate(core, source, target, delay,
-                                        api_key=api_key, adaptive_cfg=adaptive_cfg) + trail)
+                                        api_key=api_key, adaptive_cfg=adaptive_cfg, v3_cfg=v3_cfg) + trail)
     return "".join(out)
 
 
-def translate_block(block, rules, source, target, delay, api_key=None, adaptive_cfg=None):
+def translate_block(block, rules, source, target, delay, api_key=None, adaptive_cfg=None, v3_cfg=None):
     """Protect, translate, restore one block. Falls back to per-line
     translation if Google collapses/expands the number of newlines."""
     prot = Protector()
@@ -451,14 +510,14 @@ def translate_block(block, rules, source, target, delay, api_key=None, adaptive_
     if not _has_letters(protected):
         return block
     translated = translate_spans(protected, source, target, delay,
-                                 api_key=api_key, adaptive_cfg=adaptive_cfg)
+                                 api_key=api_key, adaptive_cfg=adaptive_cfg, v3_cfg=v3_cfg)
     if translated.count("\n") != block.count("\n"):
         lines = []
         for line in block.split("\n"):
             p = Protector()
             t = p.restore(translate_spans(p.protect(line, rules), source,
                                           target, delay, api_key=api_key,
-                                          adaptive_cfg=adaptive_cfg))
+                                          adaptive_cfg=adaptive_cfg, v3_cfg=v3_cfg))
             lines.append(t)
             time.sleep(delay)
         translated = "\n".join(lines)
@@ -593,7 +652,7 @@ def patch_babel(tex_text, lang):
 
 
 def translate_markdown(text, source, target, delay, update_anchors=True,
-                       api_key=None, adaptive_cfg=None):
+                       api_key=None, adaptive_cfg=None, v3_cfg=None):
     blocks = re.split(r"\n[ \t]*\n", text)
     headings, trans_texts, out = [], [], []
     for bi, block in enumerate(blocks):
@@ -603,7 +662,7 @@ def translate_markdown(text, source, target, delay, update_anchors=True,
             continue
         hl = heading_lines(block)
         translated = translate_block(block, MD_RULES, source, target, delay,
-                                     api_key=api_key, adaptive_cfg=adaptive_cfg)
+                                     api_key=api_key, adaptive_cfg=adaptive_cfg, v3_cfg=v3_cfg)
         out.append(translated)
         if hl:
             for line_no, _, orig_text in hl:
@@ -621,7 +680,7 @@ def translate_markdown(text, source, target, delay, update_anchors=True,
 
 
 def translate_tex(text, source, target, delay, patch_babel_flag=True,
-                  api_key=None, adaptive_cfg=None):
+                  api_key=None, adaptive_cfg=None, v3_cfg=None):
     marker = "\\begin{document}"
     start = text.find(marker)
     if start == -1:
@@ -629,7 +688,7 @@ def translate_tex(text, source, target, delay, patch_babel_flag=True,
     body = text[start:]
     body = "\n\n".join(
         translate_block(b, TEX_RULES, source, target, delay, api_key=api_key,
-                        adaptive_cfg=adaptive_cfg)
+                        adaptive_cfg=adaptive_cfg, v3_cfg=v3_cfg)
         for b in re.split(r"\n[ \t]*\n", body))
     result = text[:start] + body
     if patch_babel_flag:
@@ -870,6 +929,12 @@ def main(argv=None):
                     help="existing Adaptive MT dataset resource name "
                          "projects/PROJECT/locations/LOC/adaptiveMtDatasets/ID; "
                          "if given, --adaptive-example is ignored for dataset mode")
+    ap.add_argument("--v3", action="store_true",
+                    help="use v3 translation API without adaptive reference "
+                         "(requires --project; uses translate_v3 library)")
+    ap.add_argument("--model", dest="model", metavar="MODEL",
+                    help="model for v3 translation, e.g. general/nmt, "
+                         "general/translation-llm (default general/nmt)")
     args = ap.parse_args(argv)
 
     if args.config:
@@ -994,6 +1059,30 @@ def main(argv=None):
             print(f"using Google Adaptive Translation with {len(reference_pairs)} reference pairs "
                   f"from {args.adaptive_example} (project {project}, {args.location})")
 
+    # ---- v3 Translation (plain, no adaptive reference) -----------------
+    v3_cfg = None
+    if args.v3:
+        if adaptive_cfg is not None:
+            ap.error("--v3 and --adaptive-* are mutually exclusive")
+        project_v3 = _get_gcp_project(args.project)
+        if not args.dry_run and not project_v3:
+            ap.error("v3 translation requires --project (or $GOOGLE_CLOUD_PROJECT / gcloud config)")
+        elif args.dry_run and not project_v3:
+            print("note: --dry-run without --project, would require --project for real v3 translation",
+                  file=sys.stderr)
+            project_v3 = "dry-run-project"
+        v3_cfg = {
+            "project": project_v3,
+            "location": args.location,
+            "model": args.model,
+        }
+        print(f"using v3 translation (project {project_v3}, {args.location}"
+              + (f", model {args.model}" if args.model else "") + ")")
+    else:
+        if args.model:
+            ap.error("--model requires --v3")
+        v3_cfg = None
+
     for src in files:
         dst = out_path(src, args.to, args.out_dir)
         ext = os.path.splitext(src)[1].lower()
@@ -1022,12 +1111,14 @@ def main(argv=None):
                                         args.delay,
                                         update_anchors=not args.no_anchors,
                                         api_key=api_key,
-                                        adaptive_cfg=adaptive_cfg)
+                                        adaptive_cfg=adaptive_cfg,
+                                        v3_cfg=v3_cfg)
         else:
             result = translate_tex(content, args.source, args.to, args.delay,
                                    patch_babel_flag=not args.no_babel,
                                    api_key=api_key,
-                                   adaptive_cfg=adaptive_cfg)
+                                   adaptive_cfg=adaptive_cfg,
+                                   v3_cfg=v3_cfg)
         commit = git_commit_of(src)
         if commit:
             result = prepend_tag(ext, result, src, commit)

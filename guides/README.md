@@ -9,8 +9,8 @@ modified: output is written next to the source as `basename.<lang><ext>`.
 
 - Python 3 (stdlib only for the free/paid-v2 endpoints)
 - `google-cloud-translate` (`pip install google-cloud-translate`) for the
-  Adaptive MT (v3) workflow — uses Application Default Credentials
-  (`gcloud auth application-default login`)
+  v3 workflows (plain `--v3` and Adaptive MT) — uses Application Default
+  Credentials (`gcloud auth application-default login`)
 - `gpg` only if you use encrypted `--api-key-file`
 - `pandoc` (.md -> PDF) or `pdflatex` (.tex -> PDF) for `--compile`
 
@@ -24,6 +24,10 @@ Prefer `--config` for complex/adaptive runs — see `translate_docs.example.json
 
 # whole tree, custom output dir
 ./translate_docs.py --to es --all -o /tmp/out
+
+# v3 without adaptive (plain) + optional model
+./translate_docs.py --v3 --project my-proj --to de guides/manuals/preconditioning_manual.tex
+./translate_docs.py --v3 --project my-proj --model general/translation-llm --to de FILE
 
 # adaptive + config file (German example)
 ./translate_docs.py --config translate_de.json guides/manuals/preconditioning_manual.tex
@@ -112,13 +116,18 @@ Google Translate API supports, not just the ones listed above.
   uses `https://translation.googleapis.com/language/translate/v2` with
   `model=nmt` (500k chars/mo free, $20/M after; higher rate limits). `gpg -d`
   keeps the key out of history.
+- **Plain v3:** `--v3 --project PROJECT` uses
+  `https://translation.googleapis.com/v3/projects/PROJECT/locations/LOCATION:translateText`
+  via `translate_v3` (no adaptive reference; `--model` selects
+  `general/nmt` or `general/translation-llm`).
 - **Adaptive v3:** `--adaptive-example` + `--project` uses
   `https://translation.googleapis.com/v3/projects/PROJECT/locations/LOCATION:adaptiveMtTranslate`
   via the `translate_v3` library. Reference sentence pairs are extracted from
   the example pair and the 5 most relevant are sent per request. Requires a
   GCP project and Application Default Credentials (`gcloud auth
   application-default login`). For German use `preconditioning_manual_2a57ad.*`
-  as example; dataset mode via `--adaptive-dataset` is also supported.
+  as example; dataset mode via `--adaptive-dataset` is also supported. `--v3`
+  and `--adaptive-*` are mutually exclusive.
 
 ### Change detection and git
 
