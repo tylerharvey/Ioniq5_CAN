@@ -87,7 +87,8 @@ Notes
 
     Boolean flags (e.g. "compile", "dry_run") accept true/false, and the
     source files can be given as "files". A personal config holding access
-    tokens is best kept out of git.
+    tokens is best kept out of git. A complete, copyable example lives at
+    guides/translate_docs.de.json 
   * Defaults to the free/unofficial endpoint
     https://translate.googleapis.com/translate_a/single?client=gtx
     No API key required; keep --delay modest to avoid rate limits.

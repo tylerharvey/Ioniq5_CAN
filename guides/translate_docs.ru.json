@@ -1,0 +1,13 @@
+{
+  "to": "ru",
+  "source": "en",
+  "delay": 0.5,
+  "adaptive_example": "",
+  "adaptive_model": "llm",
+  "project": "",
+  "location": "us-central1",
+  "api_key_file": "/home/trh/Documents/translation_api.txt.gpg",
+  "files": [
+    "manuals/preconditioning_manual.tex"
+  ]
+}
