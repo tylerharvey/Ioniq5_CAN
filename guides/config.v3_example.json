@@ -1,0 +1,6 @@
+{
+  "to": "de",
+  "project": "REPLACE_WITH_YOUR_GCP_PROJECT",
+  "v3": true,
+  "files": ["guides/manuals/preconditioning_manual.tex"]
+}

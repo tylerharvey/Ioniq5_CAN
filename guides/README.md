@@ -16,7 +16,7 @@ modified: output is written next to the source as `basename.<lang><ext>`.
 
 ## Usage
 
-Prefer `--config` for complex/adaptive runs — see `translate_docs.example.json`:
+Prefer `--config` for complex/adaptive runs — see `config.example.json`:
 
 ```sh
 # single file (free endpoint, no key)
@@ -98,7 +98,7 @@ Google Translate API supports, not just the ones listed above.
 
 - **Config file:** ` --config FILE` reads JSON with keys mirroring long
   option names (`--adaptive-example` → `adaptive_example`); CLI overrides
-  config. Minimal v3 example `translate_de.json`:
+  config. Minimal v3 example `config.v3_example.json`:
   ```json
   {
     "to": "de",
@@ -109,7 +109,7 @@ Google Translate API supports, not just the ones listed above.
   ```
   Boolean flags use `true`/`false`, source files as `files`. A personal
   config with tokens should stay out of git — see
-  `translate_docs.example.json`.
+  `config.example.json`.
 - **Free endpoint (default):** `https://translate.googleapis.com/translate_a/single?client=gtx`
   — no key, keep `--delay` modest.
 - **Paid v2:** `--api-key` / `--api-key-file` / `$GOOGLE_TRANSLATE_API_KEY`

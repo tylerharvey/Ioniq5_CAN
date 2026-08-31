@@ -1,0 +1,6 @@
+{
+  "to": "de",
+  "project": "REPLACE_WITH_YOUR_GCP_PROJECT",
+  "adaptive_example": "guides/manuals/preconditioning_manual_2a57ad.tex",
+  "files": ["guides/manuals/preconditioning_manual.tex"]
+}
