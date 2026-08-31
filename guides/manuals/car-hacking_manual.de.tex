@@ -1,0 +1,80 @@
+% translate_docs: manuals/car-hacking_manual.tex @ 0a5b5818922daeacebc425136aa5f5af3917ba82
+\documentclass[superscriptaddress,onecolumn,floatfix]{revtex4-2}
+
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{color}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage[loose]{units}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{tasks}
+\usepackage[caption=false]{subfig}
+\usepackage[german]{babel}
+\usepackage{letltxmacro}
+
+\LetLtxMacro{\ORIGselectlanguage}{\selectlanguage}
+\makeatletter
+\DeclareRobustCommand{\selectlanguage}[1]{%
+    \@ifundefined{alias@\string#1}
+      {\ORIGselectlanguage{#1}}
+      {\begingroup\edef\x{\endgroup
+         \noexpand\ORIGselectlanguage{\@nameuse{alias@#1}}}\x}%
+}
+\newcommand{\definelanguagealias}[2]{%
+  \@namedef{alias@#1}{#2}%
+}
+\makeatother
+
+\definelanguagealias{de}{german}
+
+
+\begin{document}
+\selectlanguage{de}
+
+\begin{abstract}
+  Dieses Handbuch behandelt die grundlegende Verwendung des Car-Hacking-Kits sowie häufig gestellte Fragen.
+\end{abstract}
+\title{Handbuch für das Car-Hacking-Kit}
+\author{Electroniq Buttons Boutique}
+\email{support@electroniqbuttons.com}
+\date{\today}
+
+\maketitle
+
+
+\section{Welche Autos können das nutzen?} \label{sect:eligibility}
+Das Kit ist für den Einsatz in den meisten Fahrzeugen auf E-GMP-Basis ausgelegt. Der ICU-H-Kabelbaum ist für die Modelle Ioniq 5 (2021–2024) und EV6 (2022–2024) vorgesehen. Der CCU-Kabelbaum ist für die Modelle Ioniq 6 und GV60 (2023–2025), EV9 (2024–2027), Ioniq 5 und EV6 (2025–2027), Ioniq 9 (2026–2027) sowie Kona und Niro EV (2024–2026) konzipiert. Auch andere Modelle oder Modellüberarbeitungen, die ab 2022 auf den Markt kamen, sind wahrscheinlich kompatibel; daher bitte \href{mailto:requests@electroniqbuttons.com}{Kontakt aufnehmen} ... wenn Sie interessiert sind, und wir prüfen die Kompatibilität. 
+
+\section{Einrichtung des Basissystems}
+Beginnen Sie mit dem \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/}{Installationsanleitungen}. Siehe \href{https://meatpihq.github.io/wican-fw/config/wifi}{WiCAN-Dokumentation} für die grundlegende Einrichtung des WiCAN. Dies ist für den Einstieg in das Reverse Engineering nicht erforderlich, aus Sicherheitsgründen jedoch dringend zu empfehlen.
+
+\section{SavvyCAN}
+Es gibt viele Möglichkeiten, CAN-Logs mit einem WiCAN zu erfassen, aber die meisten entscheiden sich für \href{https://www.savvycan.com/}{SavvyCAN} hinsichtlich Benutzerfreundlichkeit und Funktionsumfang. Es steht eine knappe Anleitung zur Verfügung. \href{https://meatpihq.github.io/wican-fw/savvycan/usage}{hier}. Wir hoffen, bald mehr anbieten zu können.
+
+Ein Fork von SavvyCAN, der aktiv von Mitgliedern dieser E-GMP-Car-Hacking-Community weiterentwickelt wird, \href{https://github.com/SuperSuave/SavvyLens}{SavvyLens}, verfügt über Funktionen, die speziell für unseren Reverse-Engineering-Kontext entwickelt wurden, wie etwa das Setzen von Lesezeichen für Signale und eine komfortablere Signalansicht.
+
+\section{Ihr Auto zurücksetzen}
+
+Das Senden von CAN-Frames an Ihr Fahrzeug im Rahmen von Reverse-Engineering-Versuchen kann Steuergeräte in einen undefinierten Zustand versetzen. Bei der Analyse der entsprechenden Steuergeräte sind uns Probleme mit der Klimasteuerungsleiste und der Helligkeitsregelung aufgefallen. Sollte sich Ihr Fahrzeug ungewöhnlich verhalten, trennen Sie die 12-V-Stromversorgung für 30 Minuten, um einen Hard-Reset durchzuführen. Hinweis: Dabei gehen BMS-Daten verloren; sichern Sie diese daher bitte vorab.
+
+\section{Häufig gestellte Fragen}
+\begin{enumerate}
+  \item[F:] Warum sehe ich keine CAN-Daten?
+  \item[A:] Dafür kann es viele Gründe geben. Es ist möglich, den WiCAN so zu konfigurieren, dass dieses Verhalten auftritt (z. B. durch die Wahl eines anderen Protokolls als „savvycan“), obwohl die Standardeinstellungen eigentlich funktionieren sollten. Manche Busse nutzen CAN-FD; mit einem CAN-2.0-WiCAN werden Sie auf diesen Bussen keine Daten sehen. Wenn das Fahrzeug ausgeschaltet und länger als 5 Minuten verriegelt ist, werden ebenfalls keine Daten angezeigt. Auch Probleme mit der WLAN-Verbindung können zu Schwierigkeiten führen; prüfen Sie daher in SavvyCAN, ob der Bus noch verbunden ist.
+  \item[F:] Wie erhalte ich Zugriff auf CAN-FD-Busse?
+  \item[A:] Wir planen, demnächst ein WiCAN mit CAN-FD anzubieten. Wenn es eilt, sind das Lilygo T-2CAN-FD und ein OBD-Stecker von AliExpress vorerst eine kostengünstige Einstiegslösung.
+\end{enumerate}
+% \begin{figure}[h]
+%   \subfloat[]{\label{subfig:overview:harness}
+%   \includegraphics[height=1.95in]{photos/whole_harness.jpg} }
+%   \subfloat[]{\label{subfig:overview:shunt_cap_labeled}
+%   \includegraphics[height=1.95in]{photos/labeled_connectors_MITM_harness.jpg} }
+%    \caption{(a) Man-in-the-middle harness. (b) Overview of connectors showing shunt cap. \label{fig:overview}}
+% \end{figure}
+\appendix 
+\bibliographystyle{apsrev4-1}
+\bibliography{stemh_model}{}
+\end{document}
