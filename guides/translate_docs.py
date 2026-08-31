@@ -88,7 +88,7 @@ Notes
     Boolean flags (e.g. "compile", "dry_run") accept true/false, and the
     source files can be given as "files". A personal config holding access
     tokens is best kept out of git. A complete, copyable example lives at
-    guides/translate_docs.de.json 
+    guides/translate_docs.example.json 
   * Defaults to the free/unofficial endpoint
     https://translate.googleapis.com/translate_a/single?client=gtx
     No API key required; keep --delay modest to avoid rate limits.
@@ -103,19 +103,20 @@ Notes
     shell history. The paid endpoint has higher rate limits and counts against
     your billing quota.
   * With --adaptive-example and --project, the Google Cloud Translation
-    Adaptive MT (LLM) endpoint
+    Adaptive MT endpoint
     https://translation.googleapis.com/v3/projects/PROJECT/locations/LOCATION:adaptiveMtTranslate
-    is used. The request pins model=llm (the LLM-based adaptive translation
-    model) and carries the reference sentence pairs. The script extracts
-    reference sentence pairs from the example pair (e.g.
+    is used via the translate_v3 library. The script extracts reference
+    sentence pairs from the example pair (e.g.
     guides/manuals/preconditioning_manual_2a57ad.tex and its .de.tex
     hand-polished German translation for --to de) and sends the 5 most
     relevant pairs per request to tailor the translation. Requires a GCP
-    project and OAuth token (--access-token, $GOOGLE_OAUTH_ACCESS_TOKEN,
-    or `gcloud auth print-access-token`). For the German translation the
-    preconditioning_manual_2a57ad.* pair is the recommended example; inline
-    reference pairs are used (no dataset creation needed), or specify
-    --adaptive-dataset for a pre-created dataset.
+    project and Application Default Credentials (`gcloud auth
+    application-default login` or a service account); legacy
+    --access-token flags are accepted but ignored (the library handles auth).
+    For the German translation the preconditioning_manual_2a57ad.* pair is
+    the recommended example; inline reference pairs are used (no dataset
+    creation needed), or specify --adaptive-dataset for a pre-created
+    dataset.
   * Originals are never modified: output is written to
     basename.<lang><ext> next to the source (or into --out-dir).
   * Change detection: each translated output embeds a comment tagging the
@@ -143,6 +144,7 @@ import sys
 import time
 import urllib.parse
 import urllib.request
+from google.cloud import translate_v3
 
 API_PAID = "https://translation.googleapis.com/language/translate/v2"
 API_FREE = "https://translate.googleapis.com/translate_a/single"
@@ -362,26 +364,28 @@ def _get_gcp_project(explicit=None):
 
 
 def _adaptive_gtx(text, source, target, adaptive_cfg, reference_pairs=None):
+    """Translate via the v3 Adaptive MT endpoint using the translate_v3 client.
+
+    The library handles authentication via ADC (gcloud auth / service account);
+    no manual Bearer token is needed. Retries mirror the previous urllib logic.
+    """
     project = adaptive_cfg.get("project")
     location = adaptive_cfg.get("location", "us-central1")
     dataset = adaptive_cfg.get("dataset")
-    access_token = adaptive_cfg.get("access_token")
-    if not project or not access_token:
-        raise RuntimeError("adaptive translation requires --project and OAuth access token (via --access-token, $GOOGLE_OAUTH_ACCESS_TOKEN, or gcloud auth)")
+    if not project:
+        raise RuntimeError("adaptive translation requires --project (or $GOOGLE_CLOUD_PROJECT / gcloud config)")
     parent = f"projects/{project}/locations/{location}"
-    url = f"https://translation.googleapis.com/v3/{parent}:adaptiveMtTranslate"
-    headers = {
-        "Authorization": f"Bearer {access_token}",
-        "Content-Type": "application/json; charset=utf-8",
-        "User-Agent": HEADERS["User-Agent"],
-        "x-goog-user-project": project,
-    }
-    model = adaptive_cfg.get("model", "llm")
+    client = translate_v3.TranslationServiceClient()
+
     if dataset:
         # Expand short dataset ID to full resource name if needed
         if "/" not in dataset:
             dataset = f"{parent}/adaptiveMtDatasets/{dataset}"
-        body = {"model": model, "dataset": dataset, "content": [text]}
+        request = translate_v3.AdaptiveMtTranslateRequest(
+            parent=parent,
+            dataset=dataset,
+            content=[text],
+        )
     else:
         if reference_pairs is None:
             reference_pairs = adaptive_cfg.get("reference_pairs") or []
@@ -389,44 +393,35 @@ def _adaptive_gtx(text, source, target, adaptive_cfg, reference_pairs=None):
             reference_pairs = _select_reference_pairs(text, reference_pairs, k=5)
         # Google requires source/target language codes in referenceSentenceConfig
         src_code = source if source != "auto" else "en"
-        body = {
-            "model": model,
-            "referenceSentenceConfig": {
-                "referenceSentencePairLists": [
-                    {"referenceSentencePairs": [
-                        {"sourceSentence": s, "targetSentence": t}
-                        for s, t in reference_pairs
-                    ]}
-                ],
-                "sourceLanguageCode": src_code,
-                "targetLanguageCode": target,
-            },
-            "content": [text],
-        }
+        pairs = [
+            translate_v3.AdaptiveMtTranslateRequest.ReferenceSentencePair(
+                source_sentence=s, target_sentence=t
+            )
+            for s, t in reference_pairs
+        ]
+        pair_list = translate_v3.AdaptiveMtTranslateRequest.ReferenceSentencePairList(
+            reference_sentence_pairs=pairs
+        )
+        ref_config = translate_v3.AdaptiveMtTranslateRequest.ReferenceSentenceConfig(
+            reference_sentence_pair_lists=[pair_list],
+            source_language_code=src_code,
+            target_language_code=target,
+        )
+        request = translate_v3.AdaptiveMtTranslateRequest(
+            parent=parent,
+            dataset=dataset or "",
+            content=[text],
+            reference_sentence_config=ref_config,
+        )
     last = None
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
-            data = json.dumps(body).encode("utf-8")
-            req = urllib.request.Request(url, data=data, headers=headers, method="POST")
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                resp_data = json.loads(resp.read().decode("utf-8"))
-            # Response: {"translations": [{"translatedText": "..."}]}
-            if "translations" in resp_data and resp_data["translations"]:
-                return resp_data["translations"][0].get("translatedText", "")
-            # Fallback for other shapes
-            if "adaptiveMtTranslations" in resp_data:
-                return resp_data["adaptiveMtTranslations"][0].get("translatedText", "")
-            return resp_data.get("translatedText", "") or json.dumps(resp_data)
+            response = client.adaptive_mt_translate(request=request)
+            if response.translations:
+                return response.translations[0].translated_text
+            return ""
         except Exception as exc:  # noqa: BLE001
             last = exc
-            # Try to parse error body for diagnostics (HTTPError has .read())
-            try:
-                read = getattr(exc, "read", None)
-                if callable(read):
-                    err = read().decode("utf-8", errors="ignore")  # type: ignore[attr-defined]
-                    last = f"{exc} :: {err}"  # type: ignore[assignment]
-            except Exception:
-                pass
             time.sleep(1.0 * attempt)
     raise RuntimeError(f"Adaptive translation request failed: {last}")
 
@@ -1074,6 +1069,9 @@ def main(argv=None):
         if not args.to:
             ap.error("--adaptive-example/--adaptive-dataset requires -t/--to")
         project = _get_gcp_project(args.project)
+        # Access token is no longer required for the translate_v3 library
+        # (ADC via gcloud auth handles credentials), but we still accept
+        # --access-token / --access-token-file for backwards compatibility.
         access_token = _get_access_token(args.access_token)
         if args.access_token_file and not access_token:
             try:
@@ -1112,22 +1110,14 @@ def main(argv=None):
                       file=sys.stderr)
             print(f"adaptive translation: extracted {len(reference_pairs)} reference pairs from "
                    f"{args.adaptive_example} -> {example_tgt}")
-        # For --dry-run no API call is made, so token/project are not strictly required
+        # For --dry-run no API call is made, so project is not strictly required
         if not args.dry_run:
             if not project:
                 ap.error("adaptive translation requires --project (or $GOOGLE_CLOUD_PROJECT / gcloud config)")
-            if not access_token:
-                ap.error("adaptive translation requires OAuth token (--access-token, $GOOGLE_OAUTH_ACCESS_TOKEN, or gcloud auth login)")
         else:
             if not project:
                 print("note: --dry-run without --project, would require --project for real translation",
                       file=sys.stderr)
-            if not access_token:
-                print("note: --dry-run without access token, would require OAuth token for real translation",
-                      file=sys.stderr)
-            # Use dummy token for dry-run path (no network)
-            if not access_token:
-                access_token = "dry-run-token"
             if not project:
                 project = "dry-run-project"
         if dataset and "/" not in dataset:
