@@ -554,6 +554,32 @@ def patch_babel(tex_text, lang):
         r"\\usepackage(\[[^\]]*\])?\{babel\}",
         lambda m: "\\usepackage[" + name + "]{babel}",
         tex_text, count=1)
+    # ensure hyperref has [unicode]
+    def _add_unicode(m):
+        opts = m.group(1)
+        if opts:
+            inner = opts[1:-1]
+            parts = [p.strip() for p in inner.split(",") if p.strip()]
+            if "unicode" not in parts:
+                parts = ["unicode"] + parts
+            return "\\usepackage[" + ",".join(parts) + "]{hyperref}"
+        return "\\usepackage[unicode]{hyperref}"
+    tex_text = re.sub(r"\\usepackage(\[[^\]]*\])?\{hyperref\}", _add_unicode, tex_text, count=1)
+    # ensure babel is loaded before hyperref (required for correct bookmark encoding)
+    babel_m = re.search(r"\\usepackage(\[[^\]]*\])?\{babel\}", tex_text)
+    hyper_m = re.search(r"\\usepackage(\[[^\]]*\])?\{hyperref\}", tex_text)
+    if babel_m and hyper_m and hyper_m.start() < babel_m.start():
+        lines = tex_text.splitlines()
+        babel_idx = next(i for i, l in enumerate(lines) if re.search(r"\\usepackage(\[[^\]]*\])?\{babel\}", l))
+        hyper_idx = next(i for i, l in enumerate(lines) if re.search(r"\\usepackage(\[[^\]]*\])?\{hyperref\}", l))
+        babel_line = lines[babel_idx]
+        hyper_line = lines[hyper_idx]
+        for idx in sorted([babel_idx, hyper_idx], reverse=True):
+            del lines[idx]
+        insert_pos = min(babel_idx, hyper_idx)
+        lines.insert(insert_pos, hyper_line)
+        lines.insert(insert_pos, babel_line)
+        tex_text = "\n".join(lines)
     tex_text = re.sub(
         r"\\definelanguagealias\{[a-zA-Z-]*\}\{[^{}]*\}",
         lambda m: "\\definelanguagealias{" + lang + "}{" + name + "}",
