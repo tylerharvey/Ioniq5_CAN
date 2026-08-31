@@ -2,136 +2,19 @@
 """Translate rendered text in .md and .tex files via Google Translate,
 preserving all markup so the translated files still render correctly.
 
-What is translated (the "rendered" text only):
-  - Markdown: headings, paragraphs, list items, link labels, image alt text.
-    Section links are updated too: each translated heading gets an explicit
-    {#slug} id (matching GitHub and pandoc) and every [text](#old-slug)
-    reference is rewritten to the new slug.
-  - LaTeX: body prose, section titles, captions, \\item text, \\href display
-    text, \\title/\\author, abstract text.
-What is kept verbatim:
-  - Markdown: code spans/fences, URLs, image paths, HTML tags, formatting.
-  - LaTeX: preamble, every command, \\label/\\ref/\\cite, math, file paths,
-    URLs, emails, \\includegraphics, bibliography, comments.
+What is translated: Markdown headings/paragraphs/links and LaTeX body prose,
+captions, section titles — kept verbatim: code, math, LaTeX commands/labels,
+URLs, file paths, etc. See guides/README.md for full lists.
 
-Workflow
---------
-  1. Translate one or more files (or an entire tree) to a language:
+Workflow — prefer --config for complex/adaptive runs
+-----------------------------------------------------
+  ./translate_docs.py --to de guides/manuals/preconditioning_manual.tex
+  ./translate_docs.py --to es --all -o /tmp/out
+  ./translate_docs.py --config translate_de.json guides/manuals/preconditioning_manual.tex
+  ./translate_docs.py --to fr --compile --all          # also compile to PDF
+  ./translate_docs.py --to nl --dry-run FILE           # preview without calling Google
 
-       ./translate_docs.py --to fr guides/manuals/preconditioning_manual.tex
-       ./translate_docs.py --to de --all
-       ./translate_docs.py --to es -o /tmp/translations guides/manuals/*.tex guides/cars/*/*/*.md
-
-  2. Sanity check: no Private-Use-Area placeholder characters should remain.
-
-       rg -n $'\ue000-\uf8ff' preconditioning_manual.fr.tex   # expect no output
-
-  3. Compile to PDF and inspect: add --compile to the translate command, or
-     use --compile-only on files that are already translated:
-
-       ./translate_docs.py --to fr --compile manuals/welcome_precon.tex
-       ./translate_docs.py --compile-only --all
-
-     .md files compile with `pandoc <file>.md -o <file>.pdf`, .tex files with
-     `pdflatex`. LaTeX output requires the babel module for the target
-     language (use --no-babel if it is missing).
-
-  4. Spot check a few translated sections by eye; machine translation is
-     not perfect.
-
-Quick examples
---------------
-     # free endpoint (no key needed)
-     ./translate_docs.py --to de guides/manuals/preconditioning_manual.tex
-
-     # paid API, key from env var
-     GOOGLE_TRANSLATE_API_KEY=$KEY ./translate_docs.py --to es --all
-
-     # paid API, key in a GPG-encrypted file
-     echo -n "$KEY" | gpg -c -o api_key.gpg
-     ./translate_docs.py --api-key-file api_key.gpg --to fr -o /tmp/translations guides/manuals/*.tex guides/cars/*/*/*.md
-
-     # translate and compile to PDF in one go
-     ./translate_docs.py --api-key-file api_key.gpg --to it --compile guides/manuals/welcome_precon.tex
-
-     # just compile existing translated files, no translation
-     ./translate_docs.py --compile-only --all
-
-     # see what would be done without calling Google
-      ./translate_docs.py --to nl --dry-run guides/manuals/preconditioning_manual.tex
-
-     # adaptive translation using a hand-polished example for German
-      ./translate_docs.py --to de --adaptive-example guides/manuals/preconditioning_manual_2a57ad.tex \
-          --project my-gcp-project guides/manuals/preconditioning_manual.tex
-
-     # same run, but parameters read from a JSON config file
-      ./translate_docs.py --config translate_de.json guides/manuals/preconditioning_manual.tex
-
-Notes
------
-  * Run parameters can be read from a JSON config file with --config. Keys
-    mirror the long option names with dashes turned into underscores, e.g.
-    --adaptive-example becomes "adaptive_example". Any option you pass on the
-    command line overrides the config value; config values act as defaults.
-    For the adaptive example above, translate_de.json could contain:
-
-        {
-          "to": "de",
-          "source": "en",
-          "delay": 0.5,
-          "adaptive_example": "guides/manuals/preconditioning_manual_2a57ad.tex",
-          "project": "my-gcp-project",
-          "location": "us-central1",
-          "access_token_file": "token.gpg"
-        }
-
-    Boolean flags (e.g. "compile", "dry_run") accept true/false, and the
-    source files can be given as "files". A personal config holding access
-    tokens is best kept out of git. A complete, copyable example lives at
-    guides/translate_docs.example.json 
-  * Defaults to the free/unofficial endpoint
-    https://translate.googleapis.com/translate_a/single?client=gtx
-    No API key required; keep --delay modest to avoid rate limits.
-  * With --api-key, --api-key-file, or the GOOGLE_TRANSLATE_API_KEY
-    environment variable the paid Google Cloud Translation API v2 endpoint
-    https://translation.googleapis.com/language/translate/v2 is used instead.
-    The request pins model=nmt (Neural Machine Translation), the
-    price-optimized product: the first 500,000 characters/month are free and
-    it costs $20/million characters after that (vs $80/M for Custom
-    Translation and $25/M each way for Adaptive Translation).
-    --api-key-file decrypts the key with `gpg -d FILE`, keeping it out of
-    shell history. The paid endpoint has higher rate limits and counts against
-    your billing quota.
-  * With --adaptive-example and --project, the Google Cloud Translation
-    Adaptive MT endpoint
-    https://translation.googleapis.com/v3/projects/PROJECT/locations/LOCATION:adaptiveMtTranslate
-    is used via the translate_v3 library. The script extracts reference
-    sentence pairs from the example pair (e.g.
-    guides/manuals/preconditioning_manual_2a57ad.tex and its .de.tex
-    hand-polished German translation for --to de) and sends the 5 most
-    relevant pairs per request to tailor the translation. Requires a GCP
-    project and Application Default Credentials (`gcloud auth
-    application-default login` or a service account); legacy
-    --access-token flags are accepted but ignored (the library handles auth).
-    For the German translation the preconditioning_manual_2a57ad.* pair is
-    the recommended example; inline reference pairs are used (no dataset
-    creation needed), or specify --adaptive-dataset for a pre-created
-    dataset.
-  * Originals are never modified: output is written to
-    basename.<lang><ext> next to the source (or into --out-dir).
-  * Change detection: each translated output embeds a comment tagging the
-    source file and the git commit it was translated from
-    (`% translate_docs: FILE @ COMMIT` / `<!-- translate_docs: ... -->`).
-    Re-running `--to` on an output whose source has not changed since that
-    commit skips translation; `--compile-only` skips compiling a translated
-    file whose embedded commit still matches its working-tree content.
-    This requires a git repo; outside one, everything is always processed.
-  * Only files tracked by git are processed: untracked files are skipped.
-    All git-based features (tracking filter, change detection, embedded
-    commit tags) require a git repo; outside one, only files explicitly
-    listed as arguments are translated.
-  * For .tex, if the target language is known to babel the preamble is patched
-    to select that language (--no-babel disables this).
+Full endpoint, config, and change-detection details in guides/README.md.
 """
 
 import argparse
@@ -145,6 +28,7 @@ import time
 import urllib.parse
 import urllib.request
 from google.cloud import translate_v3
+# from google.oauth2.credentials import Credentials
 
 API_PAID = "https://translation.googleapis.com/language/translate/v2"
 API_FREE = "https://translate.googleapis.com/translate_a/single"
