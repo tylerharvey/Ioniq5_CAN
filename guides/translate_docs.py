@@ -35,7 +35,6 @@ API_FREE = "https://translate.googleapis.com/translate_a/single"
 HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) translate_docs"}
 API_KEY_ENV = "GOOGLE_TRANSLATE_API_KEY"
 PUA_START = 0xE000
-PUA_END = 0xF8FF
 PUA_RE = re.compile(r"[\ue000-\uf8ff]")
 MAX_CHARS = 1500
 MAX_ATTEMPTS = 3
@@ -200,34 +199,6 @@ def _select_reference_pairs(query, pairs, k=5):
                     key=lambda x: -x[0])
     # Always return at least min(k, len(pairs)) even if similarity low
     return [(s, t) for _, s, t in scored[:k]]
-
-
-def _get_access_token(explicit=None):
-    if explicit:
-        if os.path.isfile(explicit):
-            try:
-                with open(explicit, encoding="utf-8") as fh:
-                    tok = fh.read().strip()
-                    if tok:
-                        return tok
-            except Exception:
-                pass
-        tok = explicit.strip()
-        if tok:
-            return tok
-    for env in ("GOOGLE_OAUTH_ACCESS_TOKEN", "GOOGLE_CLOUD_ACCESS_TOKEN", "GCLOUD_ACCESS_TOKEN"):
-        tok = os.environ.get(env)
-        if tok:
-            return tok.strip()
-    for cmd in (["gcloud", "auth", "print-access-token"],
-                ["gcloud", "auth", "application-default", "print-access-token"]):
-        try:
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-            if res.returncode == 0 and res.stdout.strip():
-                return res.stdout.strip()
-        except Exception:
-            continue
-    return None
 
 
 def _get_gcp_project(explicit=None):
@@ -861,7 +832,7 @@ def main(argv=None):
                          "Adaptive MT: FILE is the source-language document "
                          "and FILE.<lang><ext> (e.g. preconditioning_manual_"
                          "2a57ad.de.tex for --to de) is its reference "
-                         "translation. Requires --project and OAuth token. "
+                         "translation. Requires --project. "
                          "For --to de this uses guides/manuals/preconditioning"
                          "_manual_2a57ad.* as the hand-polished German example.")
     ap.add_argument("--project", metavar="PROJECT",
@@ -869,19 +840,10 @@ def main(argv=None):
                          "(also $GOOGLE_CLOUD_PROJECT, or gcloud config)")
     ap.add_argument("--location", metavar="LOC", default="us-central1",
                     help="GCP location for Adaptive Translation (default us-central1)")
-    ap.add_argument("--adaptive-model", metavar="MODEL", default=None,
-                    help="Adaptive Translation model to request "
-                         "(default llm)")
     ap.add_argument("--adaptive-dataset", metavar="DATASET",
                     help="existing Adaptive MT dataset resource name "
                          "projects/PROJECT/locations/LOC/adaptiveMtDatasets/ID; "
                          "if given, --adaptive-example is ignored for dataset mode")
-    ap.add_argument("--access-token", metavar="TOKEN",
-                    help="OAuth access token for Adaptive Translation "
-                         "(also $GOOGLE_OAUTH_ACCESS_TOKEN or gcloud auth)")
-    ap.add_argument("--access-token-file", metavar="FILE",
-                    help="GPG-encrypted file containing OAuth access token; "
-                         "decrypted with `gpg -d FILE`")
     args = ap.parse_args(argv)
 
     if args.config:
@@ -953,20 +915,6 @@ def main(argv=None):
         if not args.to:
             ap.error("--adaptive-example/--adaptive-dataset requires -t/--to")
         project = _get_gcp_project(args.project)
-        # Access token is no longer required for the translate_v3 library
-        # (ADC via gcloud auth handles credentials), but we still accept
-        # --access-token / --access-token-file for backwards compatibility.
-        access_token = _get_access_token(args.access_token)
-        if args.access_token_file and not access_token:
-            try:
-                res = subprocess.run(["gpg", "-d", args.access_token_file],
-                                     capture_output=True, text=True, check=True)
-                access_token = res.stdout.strip()
-            except FileNotFoundError:
-                ap.error("gpg not found on PATH (needed for --access-token-file)")
-            except subprocess.CalledProcessError as exc:
-                ap.error("gpg -d {} failed: {}".format(
-                    args.access_token_file, exc.stderr.strip() or exc))
         dataset = args.adaptive_dataset
         reference_pairs = None
         if dataset and args.adaptive_example:
@@ -1011,17 +959,14 @@ def main(argv=None):
             "project": project,
             "location": args.location,
             "dataset": dataset,
-            "model": args.adaptive_model or "llm",
             "reference_pairs": reference_pairs,
-            "access_token": access_token,
         }
         if dataset:
             print(f"using Google Adaptive Translation dataset {dataset} in {args.location}")
         else:
             assert reference_pairs is not None  # extracted above
-            print(f"using Google Adaptive Translation (model {args.adaptive_model or 'llm'}) with "
-                  f"{len(reference_pairs)} reference pairs from {args.adaptive_example} "
-                  f"(project {project}, {args.location})")
+            print(f"using Google Adaptive Translation with {len(reference_pairs)} reference pairs "
+                  f"from {args.adaptive_example} (project {project}, {args.location})")
 
     for src in files:
         dst = out_path(src, args.to, args.out_dir)

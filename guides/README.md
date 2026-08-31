@@ -11,8 +11,7 @@ modified: output is written next to the source as `basename.<lang><ext>`.
 - `google-cloud-translate` (`pip install google-cloud-translate`) for the
   Adaptive MT (v3) workflow — uses Application Default Credentials
   (`gcloud auth application-default login`)
-- `gpg` only if you use encrypted `--api-key-file` / `--access-token-file`
-  (legacy, not needed for v3)
+- `gpg` only if you use encrypted `--api-key-file`
 - `pandoc` (.md -> PDF) or `pdflatex` (.tex -> PDF) for `--compile`
 
 ## Usage
@@ -95,16 +94,13 @@ Google Translate API supports, not just the ones listed above.
 
 - **Config file:** ` --config FILE` reads JSON with keys mirroring long
   option names (`--adaptive-example` → `adaptive_example`); CLI overrides
-  config. Example `translate_de.json`:
+  config. Minimal v3 example `translate_de.json`:
   ```json
   {
     "to": "de",
-    "source": "en",
-    "delay": 0.5,
-    "adaptive_example": "guides/manuals/preconditioning_manual_2a57ad.tex",
     "project": "my-gcp-project",
-    "location": "us-central1",
-    "access_token_file": "token.gpg"
+    "adaptive_example": "guides/manuals/preconditioning_manual_2a57ad.tex",
+    "files": ["guides/manuals/preconditioning_manual.tex"]
   }
   ```
   Boolean flags use `true`/`false`, source files as `files`. A personal
@@ -121,9 +117,8 @@ Google Translate API supports, not just the ones listed above.
   via the `translate_v3` library. Reference sentence pairs are extracted from
   the example pair and the 5 most relevant are sent per request. Requires a
   GCP project and Application Default Credentials (`gcloud auth
-  application-default login`); legacy `--access-token` flags are accepted
-  but ignored. For German use `preconditioning_manual_2a57ad.*` as example;
-  dataset mode via `--adaptive-dataset` is also supported.
+  application-default login`). For German use `preconditioning_manual_2a57ad.*`
+  as example; dataset mode via `--adaptive-dataset` is also supported.
 
 ### Change detection and git
 
