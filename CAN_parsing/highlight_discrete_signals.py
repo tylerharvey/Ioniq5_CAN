@@ -2,6 +2,10 @@
 """
 highlight_discrete_signals.py
 
+This is presently a vibe-port of the jupyter notebooks here to a headless script, 
+to make the notebook approach more generalizable, maintainable and useful. 
+Hand editing is happening, slowly.
+
 Decode CAN logs using cantools DBC files (via parsing_lib for loading) and
 highlight *discrete* changes in signals: signals that take a small set of
 distinct values and jump between them at a handful of timestamps. This is the
@@ -16,6 +20,8 @@ Two tiers are reported per log:
                         transition timestamps and (when available) VAL_ names.
   * muid fallback tier- frames *not* in the DBC are reported at whole-message
                         granularity via parsing_lib (limited unique payloads).
+
+This distinction isn't all that meaningful and will be de-emphasized.
 
 The file title is used as metadata: a keyword->expected-frame map is consulted
 and each log's report is annotated PASS/INFO based on whether the expected
@@ -44,6 +50,7 @@ from parsing_lib import (populate_dict, populate_dict_panda,
                          calculate_unique_message_id, clean_bad_timestamps,
                          return_frame_series, return_value_transitions,
                          return_frame_IDs_with_limited_message_changes)
+                         
 
 DEFAULT_DBC = os.path.expanduser('~/Packages/egmpdbc/ioniq5-2022.dbc')
 DEFAULT_LOGS = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -440,6 +447,8 @@ def main(argv=None):
                          'Off by default so mid-log events are not lost.')
     ap.add_argument('--json', dest='json_out', metavar='FILE',
                     help='Also dump machine-readable results to FILE.')
+    ap.add_argument('--plot', action='store_true', help='Enable plotting of all signal differences.')
+    ap.add_argument('--id', type=str, help='Select a frame ID to output all messages for.')
     args = ap.parse_args(argv)
 
     dbc_paths = args.dbc if args.dbc else DEFAULT_DBCS
@@ -493,6 +502,38 @@ def main(argv=None):
             'muid_fallback': muid_results,
             'metadata': [{'frame': c[0], 'ok': c[1], 'note': c[2]} for c in checks],
         })
+
+        if args.plot:
+            import matplotlib.pyplot as plt
+            
+            results = dbc_results+muid_results
+            all_interesting_ids = [result['frame_id'] for result in results]
+            for i,frame_id in enumerate(all_interesting_ids):
+                indices = np.argwhere(d['ids'] == frame_id)[:,0]
+                if(len(indices)):
+                    norm_vals = d['messages_unique_ids'][indices].astype(float)
+                    if(norm_vals.min() != norm_vals.max()):
+                        norm_vals -= norm_vals.min()
+                    norm_vals += 1e-6
+                    norm_vals /= norm_vals.max()
+                    norm_vals *= 1+(0.05*frame_id/1000)
+                    plt.plot(d['timestamps'][indices]/1e6,norm_vals,label=f'frame {hex(frame_id)}', alpha=0.5, marker='.', linestyle=None)
+                if(i % 5 == 4):
+                    plt.xlabel('Timestamp (s)')
+                    plt.legend()
+                    plt.show()
+
+            plt.xlabel('Timestamp (s)')
+            plt.legend()
+            plt.show()
+
+        if args.id:
+            frame_series = return_frame_series(d, int(args.id, 16), return_hex=True)
+            for index in np.indices(frame_series[0].shape)[0]:
+                last_timestamp = frame_series[0][index-1] if index else frame_series[0][0]
+                print(f"Message: {frame_series[1][index]}; Time Spacing: {frame_series[0][index]-last_timestamp}")
+
+
 
     print("=" * 78)
     print("SUMMARY")

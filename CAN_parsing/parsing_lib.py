@@ -159,7 +159,7 @@ def return_interesting_timestamps(dict_name,frame_ids):
             timestamps.append(dict_name['timestamps'][indices][max_diff])
     return timestamps
 
-def return_frame_series(dict_name, frame_id, bus=None):
+def return_frame_series(dict_name, frame_id, bus=None, return_hex=False):
     '''
     Return (timestamps, messages) for a single frame ID, in chronological order.
     If `bus` is given, only messages on that bus are included.
@@ -172,7 +172,10 @@ def return_frame_series(dict_name, frame_id, bus=None):
         return np.array([]), np.empty((0,8), dtype=dict_name['messages'].dtype)
     order = np.argsort(dict_name['timestamps'][indices], kind='stable')
     indices = indices[order]
-    return dict_name['timestamps'][indices], dict_name['messages'][indices]
+    if(return_hex):
+        return dict_name['timestamps'][indices], dict_name['hex_messages'][indices]
+    else:
+        return dict_name['timestamps'][indices], dict_name['messages'][indices]
 
 def return_value_transitions(timestamps, values):
     '''
