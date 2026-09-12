@@ -30,3 +30,10 @@ def savvycan_log() -> canlib.CanLog:
 def panda_log() -> canlib.CanLog:
     """The four-row panda fixture (buses 0 and 2)."""
     return canlib.load_log(fixture_log("panda_small.csv"))
+
+
+@pytest.fixture
+def bursts_log() -> canlib.CanLog:
+    """Frame 0x300 as three payload runs: AA x3, BB x2, then CC, CC, and a DD
+    on bus 1.  Used by the burst and window helpers."""
+    return canlib.load_log(fixture_log("savvycan_bursts.csv"))

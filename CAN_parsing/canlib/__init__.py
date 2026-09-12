@@ -28,7 +28,13 @@ Layout:
     is deliberately not re-exported here: ``import canlib`` needs only numpy.
 """
 
-from .discrete import cluster_times, frames_with_window_only_payloads, payloads_only_in_windows
+from .discrete import (
+    Burst,
+    cluster_times,
+    frames_with_window_only_payloads,
+    payload_bursts,
+    payloads_only_in_windows,
+)
 from .encoding import format_hex_bytes, format_hex_ids, pack_muids, unpack_payload_words
 from .frames import (
     UNIT_RAW,
@@ -90,7 +96,9 @@ __all__ = [
     "interesting_timestamps",
     "intersect_all",
     # discrete
+    "Burst",
     "cluster_times",
+    "payload_bursts",
     "payloads_only_in_windows",
     "frames_with_window_only_payloads",
 ]
