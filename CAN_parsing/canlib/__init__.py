@@ -23,11 +23,29 @@ Layout:
     Indexing a log by frame id, plus every "which frames change state" search.
 ``canlib.discrete``
     Burst clustering and the window-confined-payload searches.
+``canlib.bits``
+    Bit-level masks and the observed/invariant bit comparisons, for naming an
+    individual bit in a frame that is not in the DBC.
 ``canlib.dbc``
     cantools DBC loading and discrete-signal decoding.  Imports cantools, so it
     is deliberately not re-exported here: ``import canlib`` needs only numpy.
 """
 
+from .bits import (
+    INVARIANT,
+    MODES,
+    OBSERVED,
+    BitChange,
+    BitMasks,
+    BitScan,
+    bit_differences,
+    bit_masks,
+    bits_only_in,
+    format_bit_scan,
+    frame_bit_masks,
+    frames_only_in,
+    merge_bit_masks,
+)
 from .discrete import (
     Burst,
     cluster_times,
@@ -101,4 +119,18 @@ __all__ = [
     "payload_bursts",
     "payloads_only_in_windows",
     "frames_with_window_only_payloads",
+    # bits
+    "OBSERVED",
+    "INVARIANT",
+    "MODES",
+    "BitChange",
+    "BitMasks",
+    "BitScan",
+    "bit_masks",
+    "frame_bit_masks",
+    "merge_bit_masks",
+    "bit_differences",
+    "format_bit_scan",
+    "frames_only_in",
+    "bits_only_in",
 ]

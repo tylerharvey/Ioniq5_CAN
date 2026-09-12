@@ -16,10 +16,11 @@ test = ["pytest"]
 
 [project.scripts]
 highlight-discrete-signals = "highlight_discrete_signals:main"
+highlight-bits = "highlight_bits:main"
 
 [tool.setuptools]
 packages = ["canlib"]
-py-modules = ["highlight_discrete_signals", "condition_mode_analysis"]
+py-modules = ["highlight_discrete_signals", "highlight_bits", "condition_mode_analysis"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

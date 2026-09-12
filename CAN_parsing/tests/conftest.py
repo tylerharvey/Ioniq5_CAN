@@ -37,3 +37,16 @@ def bursts_log() -> canlib.CanLog:
     """Frame 0x300 as three payload runs: AA x3, BB x2, then CC, CC, and a DD
     on bus 1.  Used by the burst and window helpers."""
     return canlib.load_log(fixture_log("savvycan_bursts.csv"))
+
+
+@pytest.fixture
+def bits_log() -> canlib.CanLog:
+    """Frame 0x100, whose byte 0 goes 00 -> 01 -> 01 and byte 1 goes
+    0F -> 00 -> 00, plus a frame 0x150 absent from the background fixture."""
+    return canlib.load_log(fixture_log("savvycan_bits.csv"))
+
+
+@pytest.fixture
+def bits_background() -> canlib.CanLog:
+    """Frame 0x100 held at all-zero, plus an unrelated frame 0x200."""
+    return canlib.load_log(fixture_log("savvycan_bits_background.csv"))
