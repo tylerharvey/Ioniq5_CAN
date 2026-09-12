@@ -2,15 +2,15 @@
 """
 highlight_discrete_signals.py
 
-This is presently a vibe-port of the jupyter notebooks here to a headless script, 
-to make the notebook approach more generalizable, maintainable and useful. 
-Hand editing is happening, slowly.
+Decode CAN logs using cantools DBC files and highlight *discrete* changes in
+signals: signals that take a small set of distinct values and jump between them
+at a handful of timestamps.  This is the signal-level analogue of the
+whole-message "control signal" search the notebooks (parsing_*.ipynb) do with
+payload ids.
 
-Decode CAN logs using cantools DBC files (via parsing_lib for loading) and
-highlight *discrete* changes in signals: signals that take a small set of
-distinct values and jump between them at a handful of timestamps. This is the
-signal-level analogue of the whole-message "control signal" search that the
-notebooks (parsing_*.ipynb) do with messages_unique_ids.
+Loading, frame indexing, the payload searches and the DBC decoding all live in
+the ``canlib`` package next to this script; this file is the command line and
+the report.
 
 Two tiers are reported per log:
 
@@ -19,7 +19,7 @@ Two tiers are reported per log:
                         that change between few states are printed with their
                         transition timestamps and (when available) VAL_ names.
   * muid fallback tier- frames *not* in the DBC are reported at whole-message
-                        granularity via parsing_lib (limited unique payloads).
+                        granularity (limited unique payloads).
 
 This distinction isn't all that meaningful and will be de-emphasized.
 
@@ -35,120 +35,20 @@ Examples
 """
 
 import argparse
-import contextlib
 import glob
-import io
 import json
 import os
-import re
 import sys
 
-import numpy as np
+import canlib
+from canlib import dbc as dbc_lib
 
-import cantools
-from parsing_lib import (populate_dict, populate_dict_panda,
-                         calculate_unique_message_id, clean_bad_timestamps,
-                         return_frame_series, return_value_transitions,
-                         return_frame_IDs_with_limited_message_changes)
-                         
 
 DEFAULT_DBC = os.path.expanduser('~/Packages/egmpdbc/ioniq5-2022.dbc')
 DEFAULT_LOGS = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                              '..', 'CAN_logs'))
 DEFAULT_DBCS = [os.path.join(os.path.dirname(DEFAULT_DBC), f)
                 for f in ('ioniq5-2022.dbc', 'ev6-2024.dbc', 'ioniq6-2023-2025.dbc')]
-
-
-# ---------------------------------------------------------------------------
-# DBC loading (robust to cantools VFrameFormat bug on extended IDs)
-# ---------------------------------------------------------------------------
-def _extract_message_blocks(text):
-    """Yield (frame_id, block_lines) for each BO_ block in stripped DBC text.
-
-    A block runs from a `BO_ <id>` line through any following SG_ lines until
-    the next top-level keyword. Original byte order is preserved verbatim.
-    VAL_ lines are handled separately (see `_extract_val_tables`): in these
-    DBCs they live in a trailing section rather than inside the BO_ block.
-    """
-    block = None
-    block_id = 0
-    for raw in text.splitlines():
-        line = raw.strip()
-        if not line:
-            continue
-        if line.startswith('BO_ '):
-            if block is not None:
-                yield block_id, block
-            parts = line.split()
-            block_id = int(parts[1])
-            block = [raw]
-        elif block is not None and line.startswith('SG_'):
-            block.append(raw)
-        elif block is not None:
-            yield block_id, block
-            block = None
-    if block is not None:
-        yield block_id, block
-
-
-def _extract_val_tables(text):
-    """Group VAL_ value-table lines by the message id they define."""
-    tables = {}
-    for raw in text.splitlines():
-        line = raw.strip()
-        if not line.startswith('VAL_ '):
-            continue
-        parts = line.split()
-        try:
-            fid = int(parts[1])
-        except (IndexError, ValueError):
-            continue
-        tables.setdefault(fid, []).append(raw)
-    return tables
-
-
-def load_dbc(dbc_paths):
-    """Load and merge one or more DBC files.
-
-    cantools fails on `BA_ "VFrameFormat" BO_ <id> 1;` lines (extended-ID
-    messages). The extended bit is already encoded in the frame id (bit
-    0x80000000), so those attribute lines are stripped before parsing.
-    The first DBC that defines a frame wins; later files only fill gaps.
-    """
-    merged = cantools.database.can.database.Database()
-    seen = set()
-    loaded = 0
-    for path in dbc_paths:
-        try:
-            with open(path, 'r', errors='replace') as fh:
-                text = fh.read()
-        except OSError as e:
-            print(f"WARN: cannot read DBC {path}: {e}", file=sys.stderr)
-            continue
-        lines = [ln for ln in text.splitlines() if 'VFrameFormat' not in ln]
-        stripped = '\n'.join(lines)
-        # sanity check the file parses standalone before merging
-        try:
-            cantools.database.load_string(stripped)
-        except Exception as e:
-            print(f"WARN: could not parse DBC {path}: {e}", file=sys.stderr)
-            continue
-        val_tables = _extract_val_tables(stripped)
-        for fid, block in _extract_message_blocks(stripped):
-            if fid in seen:
-                continue
-            seen.add(fid)
-            # VAL_ lines define signal value names; without them choices are
-            # lost (the raw text would attach them to the wrong BO_ block).
-            block = list(block) + val_tables.get(fid, [])
-            try:
-                with contextlib.redirect_stdout(io.StringIO()):
-                    merged.add_dbc_string('\n'.join(block))
-            except Exception as e:
-                print(f"WARN: skip {hex(fid)} in {path}: {e}", file=sys.stderr)
-        loaded += 1
-        print(f"Loaded DBC: {path}")
-    return merged if loaded else None
 
 
 # ---------------------------------------------------------------------------
@@ -196,152 +96,40 @@ def title_keywords(filename):
 # ---------------------------------------------------------------------------
 # Log loading
 # ---------------------------------------------------------------------------
-def sniff_format(path):
-    """Return 'panda' or 'savvycan' based on the CSV header."""
-    with open(path, 'r') as fh:
-        header = fh.readline()
-    if header.lower().startswith('bus'):
-        return 'panda'
-    if header.lower().startswith('time stamp'):
-        return 'savvycan'
-    raise ValueError(f"Unrecognized log header in {path}: {header!r}")
-
-
 def load_log(path, clean=False):
-    """Load a log via parsing_lib, auto-detecting the format."""
-    fmt = sniff_format(path)
-    d = {}
-    if fmt == 'panda':
-        populate_dict_panda(d, path)
-    else:
-        populate_dict(d, path)
-    if clean and d['timestamps'].dtype.kind in 'iu':
-        clean_bad_timestamps(d)
-    calculate_unique_message_id(d)
-    d['_format'] = fmt
-    return d
+    """Load a log with canlib, optionally dropping the pre-reset fragment.
 
-
-def timestamps_to_seconds(ts, fmt):
-    """SavvyCAN ints are microseconds, panda floats are seconds."""
-    if fmt == 'savvycan' and ts.dtype.kind in 'iu':
-        return ts.astype(float) / 1e6
-    return ts.astype(float)
-
-
-# ---------------------------------------------------------------------------
-# DBC signal-level discrete change detection
-# ---------------------------------------------------------------------------
-def is_excluded_frame(db, frame_id):
-    try:
-        msg = db.get_message_by_frame_id(frame_id)
-    except KeyError:
-        return False
-    return msg.name.startswith('ISOTP') or msg.name.startswith('VIN')
-
-
-def signal_display_name(signal, value):
-    """Return value as a string, using VAL_ names when available."""
-    if signal.choices:
-        try:
-            raw = int(value)
-        except (TypeError, ValueError):
-            return str(value)
-        if raw in signal.choices:
-            return f"{signal.choices[raw]} ({raw})"
-    if isinstance(value, float):
-        return f"{value:.3f}"
-    return str(value)
-
-
-def analyze_frame_signals(d, frame_id, db, threshold, min_changes):
-    """Return list of (signal_name, n_distinct, transitions) for a DBC frame."""
-    ts_raw, msgs = return_frame_series(d, frame_id)
-    if len(msgs) == 0:
-        return []
-    ts = timestamps_to_seconds(ts_raw, d['_format'])
-    msg = db.get_message_by_frame_id(frame_id)
-    report = []
-    for signal in msg.signals:
-        values = []
-        ok = True
-        for m in msgs:
-            try:
-                dec = db.decode_message(frame_id, m.astype(np.uint8).tobytes(),
-                                        decode_choices=False)
-                values.append(dec[signal.name])
-            except Exception:
-                ok = False
-                break
-        if not ok or len(values) != len(ts):
-            continue
-        values = np.asarray(values)
-        distinct = np.unique(values)
-        if not (1 < len(distinct) <= threshold):
-            continue
-        indices, change_ts, from_v, to_v = return_value_transitions(ts, values)
-        if len(indices) < min_changes:
-            continue
-        transitions = []
-        for t, f, t_ in zip(change_ts, from_v, to_v):
-            transitions.append({
-                'time_s': float(t),
-                'from': signal_display_name(signal, f),
-                'to': signal_display_name(signal, t_),
-            })
-        report.append({
-            'signal': signal.name,
-            'n_distinct': int(len(distinct)),
-            'values': [signal_display_name(signal, v) for v in distinct],
-            'n_changes': int(len(indices)),
-            'transitions': transitions,
-        })
-    return report
-
-
-def analyze_log_dbc(d, db, threshold, min_changes):
-    """Iterate DBC frames present in the log and return discrete signals."""
-    results = []
-    for frame_id in np.unique(d['ids']):
-        frame_id = int(frame_id)
-        try:
-            msg = db.get_message_by_frame_id(frame_id)
-        except KeyError:
-            continue
-        if is_excluded_frame(db, frame_id):
-            continue
-        signals = analyze_frame_signals(d, frame_id, db, threshold, min_changes)
-        if signals:
-            results.append({'frame_id': frame_id, 'frame_name': msg.name, 'signals': signals})
-    return results
+    `--clean-timestamps` is off by default because these logs restart their
+    capture mid-file, and truncating at the first reset loses whatever the
+    event of interest was in that first segment.
+    """
+    log = canlib.load_log(path)
+    if not clean:
+        return log
+    drops, jumps = canlib.timestamp_discontinuities(log)
+    print(f"Identified {drops} drops in timestamp and {jumps} total timestamp jumps.")
+    truncated, _dropped = log.after_timestamp_reset()
+    return truncated
 
 
 # ---------------------------------------------------------------------------
 # Muid fallback tier (frames not in the DBC)
 # ---------------------------------------------------------------------------
-def analyze_log_muid_fallback(d, threshold, db=None):
-    """Frames with a limited set of distinct payloads, using parsing_lib."""
-    frames = return_frame_IDs_with_limited_message_changes(d, threshold)
-    out = []
-    for frame_id, n_unique in frames:
-        if db is not None:
-            try:
-                db.get_message_by_frame_id(int(frame_id))
-                continue  # handled at signal level
-            except KeyError:
-                pass
-        indices = np.argwhere(d['ids'] == frame_id)[:,0]
-        ts_raw = d['timestamps'][indices]
-        ts = timestamps_to_seconds(ts_raw, d['_format'])
-        order = np.argsort(ts, kind='stable')
-        ts, muids = ts[order], d['messages_unique_ids'][indices][order]
-        _, change_ts, _, _ = return_value_transitions(ts, muids)
-        out.append({
-            'frame_id': frame_id,
-            'n_unique_payloads': n_unique,
-            'change_times_s': [float(t) for t in change_ts],
+def analyze_log_muid_fallback(log, threshold, exclude_ids=()):
+    """Frames with a limited set of distinct payloads that are not in the DBC."""
+    fallback = []
+    for frame_id, n_unique in canlib.limited_unique_frames(log, threshold):
+        if frame_id in exclude_ids:
+            continue  # already reported at signal level
+        timestamps, payloads = canlib.frame_series(log, frame_id)
+        _, change_times, _, _ = canlib.value_transitions(
+            timestamps, canlib.pack_muids(payloads))
+        fallback.append({
+            'frame_id': int(frame_id),
+            'n_unique_payloads': int(n_unique),
+            'change_times_s': [float(t) for t in change_times],
         })
-    return out
+    return fallback
 
 
 # ---------------------------------------------------------------------------
@@ -397,11 +185,8 @@ def verify_log(log_path, dbc_results, muid_results):
     if not expected:
         return [], 'no metadata match'
     # compare by numeric id, not zero-padded hex strings, so 0x38 == 0x038
-    seen_ids = set()
-    for res in dbc_results:
-        seen_ids.add(int(res['frame_id']))
-    for fr in muid_results:
-        seen_ids.add(int(fr['frame_id']))
+    seen_ids = {int(res['frame_id']) for res in dbc_results}
+    seen_ids.update(int(fr['frame_id']) for fr in muid_results)
 
     checks = []
     for exp in sorted(expected, key=lambda s: int(s, 16)):
@@ -412,6 +197,61 @@ def verify_log(log_path, dbc_results, muid_results):
             ok, note = True, 'expected ABSENT (no preconditioning)'
         checks.append((exp, ok, note))
     return checks, 'verified'
+
+
+def print_metadata(checks, state):
+    print(f"\n  METADATA {state.upper()}:")
+    for exp, ok, note in checks:
+        mark = 'OK ' if ok else '!! '
+        print(f"    [{mark}] expected {exp}: {note}")
+
+
+def print_summary(summary):
+    print("=" * 78)
+    print("SUMMARY")
+    print("=" * 78)
+    for entry in summary:
+        meta = ",".join(f"{c['frame']}:{'OK' if c['ok'] else 'X'}"
+                        for c in entry['metadata_checks'])
+        print(f"  {entry['file']:<70} disc={entry['n_discrete_signals']:<3} "
+              f"muid={entry['n_muid_frames']:<3} {meta}")
+
+
+# ---------------------------------------------------------------------------
+# Optional interactive output
+# ---------------------------------------------------------------------------
+def plot_results(log, frame_ids):
+    """Plot each frame's payload state, normalised, against time."""
+    import matplotlib.pyplot as plt
+
+    for i, frame_id in enumerate(frame_ids):
+        indices = canlib.frame_indices(log, frame_id)
+        if len(indices):
+            norm_vals = log.muids[indices].astype(float)
+            if norm_vals.min() != norm_vals.max():
+                norm_vals -= norm_vals.min()
+            norm_vals += 1e-6
+            norm_vals /= norm_vals.max()
+            norm_vals *= 1+(0.05*frame_id/1000)
+            plt.plot(log.time_s[indices], norm_vals, label=f'frame {hex(frame_id)}',
+                     alpha=0.5, marker='.', linestyle=None)
+        if i % 5 == 4:
+            plt.xlabel('Timestamp (s)')
+            plt.legend()
+            plt.show()
+
+    plt.xlabel('Timestamp (s)')
+    plt.legend()
+    plt.show()
+
+
+def print_frame_series(log, frame_id):
+    """Print every payload of one frame id with the gap to the previous one."""
+    times, payloads = canlib.frame_series(log, frame_id, hex=True)
+    for index in range(times.size):
+        last_timestamp = times[index-1] if index else times[0]
+        print(f"Message: {payloads[index]}; "
+              f"Time Spacing: {times[index]-last_timestamp:.6f}s")
 
 
 # ---------------------------------------------------------------------------
@@ -430,7 +270,7 @@ def collect_logs(paths):
     return sorted(set(os.path.abspath(f) for f in files))
 
 
-def main(argv=None):
+def parse_args(argv=None):
     ap = argparse.ArgumentParser(description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--dbc', action='append', default=[], metavar='DBC',
@@ -449,103 +289,85 @@ def main(argv=None):
                     help='Also dump machine-readable results to FILE.')
     ap.add_argument('--plot', action='store_true', help='Enable plotting of all signal differences.')
     ap.add_argument('--id', type=str, help='Select a frame ID to output all messages for.')
-    args = ap.parse_args(argv)
+    return ap.parse_args(argv)
+
+
+def dbc_label(dbc_paths):
+    """Name of the first DBC file, as shown in the report header."""
+    return os.path.basename(dbc_paths[0]) if dbc_paths else 'merged'
+
+
+def analyze_log(log, path, db, args, db_label, excluded_ids):
+    """Report one log and return its ``(dbc_results, muid_results, summary, json)``."""
+    dbc_results = dbc_lib.discrete_signals_for_log(log, db, args.threshold, args.min_changes)
+    muid_results = analyze_log_muid_fallback(log, args.threshold, excluded_ids)
+    checks, state = verify_log(path, dbc_results, muid_results)
+
+    print(format_report(path, db_label, dbc_results, muid_results, title_keywords(path)))
+    if checks:
+        print_metadata(checks, state)
+    print()
+
+    metadata = [{'frame': c[0], 'ok': c[1], 'note': c[2]} for c in checks]
+    summary = {
+        'file': os.path.basename(path),
+        'format': log.fmt,
+        'n_discrete_signals': sum(len(r['signals']) for r in dbc_results),
+        'n_muid_frames': len(muid_results),
+        'metadata_checks': metadata,
+    }
+    record = {
+        'file': path,
+        'format': log.fmt,
+        'dbc': db_label,
+        'dbc_signal_results': dbc_results,
+        'muid_fallback': muid_results,
+        'metadata': metadata,
+    }
+    return dbc_results, muid_results, summary, record
+
+
+def main(argv=None):
+    args = parse_args(argv)
 
     dbc_paths = args.dbc if args.dbc else DEFAULT_DBCS
-    db = load_dbc(dbc_paths)
+    db = dbc_lib.load_dbc(dbc_paths)
     if db is None:
         print("ERROR: no usable DBC.", file=sys.stderr)
         return 1
 
-    dbc_label = os.path.basename(dbc_paths[0]) if dbc_paths else 'merged'
     logs = collect_logs(args.logs)
     if not logs:
         print("ERROR: no log files found.", file=sys.stderr)
         return 1
 
-    all_json = []
+    db_label = dbc_label(dbc_paths)
+    excluded_ids = dbc_lib.frame_ids(db)
     summary = []
-    for lp in logs:
+    records = []
+    for path in logs:
         try:
-            d = load_log(lp, clean=args.clean_timestamps)
+            log = load_log(path, clean=args.clean_timestamps)
         except Exception as e:
-            print(f"WARN: skipping {lp}: {e}", file=sys.stderr)
+            print(f"WARN: skipping {path}: {e}", file=sys.stderr)
             continue
-        dbc_results = analyze_log_dbc(d, db, args.threshold, args.min_changes)
-        muid_results = analyze_log_muid_fallback(d, args.threshold, db=db)
-        keywords = title_keywords(lp)
-        checks, state = verify_log(lp, dbc_results, muid_results)
-
-        print(format_report(lp, dbc_label, dbc_results, muid_results, keywords))
-
-        if checks:
-            print(f"\n  METADATA {state.upper()}:")
-            for exp, ok, note in checks:
-                mark = 'OK ' if ok else '!! '
-                print(f"    [{mark}] expected {exp}: {note}")
-        print()
-
-        # one-line summary for easy verification
-        n_sig = sum(len(r['signals']) for r in dbc_results)
-        summary.append({
-            'file': os.path.basename(lp),
-            'format': d['_format'],
-            'n_discrete_signals': n_sig,
-            'n_muid_frames': len(muid_results),
-            'metadata_checks': [{'frame': c[0], 'ok': c[1], 'note': c[2]} for c in checks],
-        })
-        all_json.append({
-            'file': lp,
-            'format': d['_format'],
-            'dbc': dbc_label,
-            'dbc_signal_results': dbc_results,
-            'muid_fallback': muid_results,
-            'metadata': [{'frame': c[0], 'ok': c[1], 'note': c[2]} for c in checks],
-        })
+        dbc_results, muid_results, entry, record = analyze_log(
+            log, path, db, args, db_label, excluded_ids)
+        summary.append(entry)
+        records.append(record)
 
         if args.plot:
-            import matplotlib.pyplot as plt
-            
-            results = dbc_results+muid_results
-            all_interesting_ids = [result['frame_id'] for result in results]
-            for i,frame_id in enumerate(all_interesting_ids):
-                indices = np.argwhere(d['ids'] == frame_id)[:,0]
-                if(len(indices)):
-                    norm_vals = d['messages_unique_ids'][indices].astype(float)
-                    if(norm_vals.min() != norm_vals.max()):
-                        norm_vals -= norm_vals.min()
-                    norm_vals += 1e-6
-                    norm_vals /= norm_vals.max()
-                    norm_vals *= 1+(0.05*frame_id/1000)
-                    plt.plot(d['timestamps'][indices]/1e6,norm_vals,label=f'frame {hex(frame_id)}', alpha=0.5, marker='.', linestyle=None)
-                if(i % 5 == 4):
-                    plt.xlabel('Timestamp (s)')
-                    plt.legend()
-                    plt.show()
-
-            plt.xlabel('Timestamp (s)')
-            plt.legend()
-            plt.show()
+            plot_results(log, [r['frame_id'] for r in dbc_results]
+                              + [f['frame_id'] for f in muid_results])
 
         if args.id:
-            frame_series = return_frame_series(d, int(args.id, 16), return_hex=True)
-            for index in np.indices(frame_series[0].shape)[0]:
-                last_timestamp = frame_series[0][index-1] if index else frame_series[0][0]
-                print(f"Message: {frame_series[1][index]}; Time Spacing: {frame_series[0][index]-last_timestamp}")
+            print_frame_series(log, int(args.id, 16))
 
-
-
-    print("=" * 78)
-    print("SUMMARY")
-    print("=" * 78)
-    for s in summary:
-        meta = ",".join(f"{c['frame']}:{'OK' if c['ok'] else 'X'}" for c in s['metadata_checks'])
-        print(f"  {s['file']:<70} disc={s['n_discrete_signals']:<3} "
-              f"muid={s['n_muid_frames']:<3} {meta}")
+    print_summary(summary)
 
     if args.json_out:
         with open(args.json_out, 'w') as fh:
-            json.dump(all_json, fh, indent=2)
+            json.dump(records, fh, indent=2)
         print(f"\nWrote JSON results to {args.json_out}")
     return 0
 

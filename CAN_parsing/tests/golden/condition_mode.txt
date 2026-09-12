@@ -1,0 +1,134 @@
+====================================================================================================
+M-CAN_MITM_condition_mode_on_off_on.csv   post-reset 53512 frames, 0.07-30.75 s
+  0x0C7 requests (bus 1, head-unit side):
+      0.993s  x3      0x10  00 00 00 10 00 00 00 00
+      1.125s  x3      zero  00 00 00 00 00 00 00 00
+      1.499s  x3      hold  00 00 00 E0 07 00 00 00
+      2.161s  x3   DISABLE  00 00 00 E8 07 00 00 00
+      2.283s  x3      hold  00 00 00 E0 07 00 00 00
+      3.241s  x3    ENABLE  00 00 00 F0 07 00 00 00
+      3.361s  x3      hold  00 00 00 E0 07 00 00 00
+      3.583s  x3      zero  00 00 00 00 00 00 00 00
+      3.695s  x3      hold  00 00 00 E0 07 00 00 00
+  derived state intervals: [('2.16', '3.24', 'OFF'), ('3.24', 'end', 'ON')]
+
+  bus-0 bytes with a low-cardinality transition aligned to a request:
+    0x0122 D5: values=['45', '46']  transitions=9  matched=1/9
+          0.117s  46->45   (nearest request 0x10 at 0.993s, -0.876s)
+          0.222s  45->46   (nearest request 0x10 at 0.993s, -0.771s)
+          0.269s  46->45   (nearest request 0x10 at 0.993s, -0.724s)
+          0.317s  45->46   (nearest request 0x10 at 0.993s, -0.676s)
+          0.472s  46->45   (nearest request 0x10 at 0.993s, -0.521s)
+          0.617s  45->46   (nearest request 0x10 at 0.993s, -0.376s)
+          0.672s  46->45   (nearest request 0x10 at 0.993s, -0.321s)
+          1.917s  45->46   (nearest request DISABLE at 2.161s, -0.244s)
+          1.967s  46->45   (nearest request DISABLE at 2.161s, -0.194s)
+    0x0122 D8: values=['45', '46']  transitions=1  matched=2/9
+          3.567s  46->45   (nearest request zero at 3.583s, -0.016s)
+    0x0257 D8: values=['8B', '8C']  transitions=1  matched=2/9
+          1.661s  8B->8C   (nearest request hold at 1.499s, +0.162s)
+    0x0259 D5: values=['28', '2C']  transitions=9  matched=3/9
+          3.462s  28->2C   (nearest request hold at 3.361s, +0.101s)
+          3.661s  2C->28   (nearest request hold at 3.695s, -0.034s)
+          4.464s  28->2C   (nearest request hold at 3.695s, +0.769s)
+          4.664s  2C->28   (nearest request hold at 3.695s, +0.969s)
+          5.265s  28->2C   (nearest request hold at 3.695s, +1.570s)
+          5.463s  2C->28   (nearest request hold at 3.695s, +1.768s)
+          5.662s  28->2C   (nearest request hold at 3.695s, +1.967s)
+          6.465s  2C->28   (nearest request hold at 3.695s, +2.770s)
+          6.662s  28->2C   (nearest request hold at 3.695s, +2.967s)
+    0x025b D4: values=['00', '40']  transitions=3  matched=4/9
+          1.001s  00->40   (nearest request 0x10 at 0.993s, +0.008s)
+          2.201s  40->00   (nearest request DISABLE at 2.161s, +0.039s)
+          3.404s  00->40   (nearest request hold at 3.361s, +0.043s)
+    0x025d D6: values=['40', '80']  transitions=3  matched=4/9
+          1.003s  40->80   (nearest request 0x10 at 0.993s, +0.010s)
+          2.202s  80->40   (nearest request DISABLE at 2.161s, +0.041s)
+          3.405s  40->80   (nearest request hold at 3.361s, +0.044s)
+    0x03b8 D1: values=['D2', 'D3']  transitions=6  matched=2/9
+          4.065s  D2->D3   (nearest request hold at 3.695s, +0.370s)
+          6.468s  D3->D2   (nearest request hold at 3.695s, +2.773s)
+         12.864s  D2->D3   (nearest request hold at 3.695s, +9.169s)
+         15.464s  D3->D2   (nearest request hold at 3.695s, +11.769s)
+         21.864s  D2->D3   (nearest request hold at 3.695s, +18.169s)
+         24.262s  D3->D2   (nearest request hold at 3.695s, +20.567s)
+    0x0419 D6: values=['79', '7A']  transitions=1  matched=2/9
+          2.485s  79->7A   (nearest request hold at 2.283s, +0.203s)
+
+  bus-0 frames whose whole payload appears only while enabled or only while disabled:
+    0x0122 n=42 uniq=3
+        ONLY-ON  FF D9 67 1F 45 45 46 45  {'OFF': 0, 'ON': 13}
+    0x025d n=11 uniq=2
+        ONLY-OFF  00 C8 00 00 00 40 C0 70  {'OFF': 6, 'ON': 0}
+        ONLY-ON  00 C8 00 00 00 80 C0 70  {'OFF': 0, 'ON': 5}
+    0x030d n=11 uniq=2
+        ONLY-OFF  00 00 00 00 3F 00 00 00  {'OFF': 6, 'ON': 0}
+        ONLY-ON  00 00 00 00 FF 00 00 00  {'OFF': 0, 'ON': 5}
+    0x0445 n=16 uniq=3
+        ONLY-OFF  DE 50 00 00 00 00 00 18  {'OFF': 5, 'ON': 0}
+        ONLY-ON  B1 70 00 00 00 00 00 18  {'OFF': 0, 'ON': 7}
+====================================================================================================
+M-CAN_MITM_condition_mode_off_on_off_on.csv   post-reset 36923 frames, 0.24-21.33 s
+  0x0C7 requests (bus 1, head-unit side):
+      1.680s  x3   DISABLE  00 00 00 E8 07 00 00 00
+      1.794s  x3      hold  00 00 00 E0 07 00 00 00
+      2.654s  x3    ENABLE  00 00 00 F0 07 00 00 00
+      2.778s  x1      hold  00 00 00 E0 07 00 00 00
+      2.808s  x3      zero  00 00 00 00 00 00 00 00
+      2.930s  x3      hold  00 00 00 E0 07 00 00 00
+      3.538s  x3   DISABLE  00 00 00 E8 07 00 00 00
+      3.660s  x3      hold  00 00 00 E0 07 00 00 00
+      4.610s  x3    ENABLE  00 00 00 F0 07 00 00 00
+      4.738s  x3      hold  00 00 00 E0 07 00 00 00
+      5.076s  x3      zero  00 00 00 00 00 00 00 00
+      5.195s  x3      hold  00 00 00 E0 07 00 00 00
+  derived state intervals: [('1.68', '2.65', 'OFF'), ('2.65', '3.54', 'ON'), ('3.54', '4.61', 'OFF'), ('4.61', 'end', 'ON')]
+
+  bus-0 bytes with a low-cardinality transition aligned to a request:
+    0x00a2 D5: values=['00', '01']  transitions=1  matched=1/12
+          1.779s  01->00   (nearest request hold at 1.794s, -0.015s)
+    0x01b3 D2: values=['22', '23', '24']  transitions=6  matched=2/12
+          1.404s  24->23   (nearest request DISABLE at 1.680s, -0.277s)
+          1.603s  23->24   (nearest request DISABLE at 1.680s, -0.077s)
+          1.804s  24->23   (nearest request hold at 1.794s, +0.010s)
+         12.304s  23->22   (nearest request hold at 5.195s, +7.110s)
+         12.404s  22->23   (nearest request hold at 5.195s, +7.209s)
+         13.204s  23->22   (nearest request hold at 5.195s, +8.009s)
+    0x0253 D5: values=['4F', '50']  transitions=4  matched=4/12
+          2.970s  50->4F   (nearest request hold at 2.930s, +0.040s)
+          3.170s  4F->50   (nearest request hold at 2.930s, +0.240s)
+         13.570s  50->4F   (nearest request hold at 5.195s, +8.375s)
+         13.770s  4F->50   (nearest request hold at 5.195s, +8.575s)
+    0x025b D4: values=['00', '40']  transitions=4  matched=6/12
+          1.884s  40->00   (nearest request hold at 1.794s, +0.090s)
+          2.679s  00->40   (nearest request ENABLE at 2.654s, +0.025s)
+          3.676s  40->00   (nearest request hold at 3.660s, +0.016s)
+          4.677s  00->40   (nearest request hold at 4.738s, -0.061s)
+    0x025d D6: values=['40', '80']  transitions=4  matched=6/12
+          1.886s  80->40   (nearest request hold at 1.794s, +0.092s)
+          2.682s  40->80   (nearest request ENABLE at 2.654s, +0.028s)
+          3.678s  80->40   (nearest request hold at 3.660s, +0.018s)
+          4.679s  40->80   (nearest request hold at 4.738s, -0.059s)
+    0x03b1 D1: values=['9B', 'FF']  transitions=2  matched=2/12
+          4.592s  9B->FF   (nearest request ENABLE at 4.610s, -0.018s)
+          4.792s  FF->9B   (nearest request hold at 4.738s, +0.054s)
+    0x03b1 D2: values=['3C', 'FF']  transitions=2  matched=2/12
+          4.592s  3C->FF   (nearest request ENABLE at 4.610s, -0.018s)
+          4.792s  FF->3C   (nearest request hold at 4.738s, +0.054s)
+    0x03b8 D1: values=['D2', 'D3']  transitions=5  matched=2/12
+          1.534s  D2->D3   (nearest request DISABLE at 1.680s, -0.146s)
+          3.934s  D3->D2   (nearest request hold at 3.660s, +0.274s)
+         10.533s  D2->D3   (nearest request hold at 5.195s, +5.338s)
+         13.136s  D3->D2   (nearest request hold at 5.195s, +7.941s)
+         19.533s  D2->D3   (nearest request hold at 5.195s, +14.338s)
+
+  bus-0 frames whose whole payload appears only while enabled or only while disabled:
+    0x025d n=20 uniq=2
+        ONLY-OFF  00 C8 00 00 00 40 C0 70  {'OFF': 9, 'ON': 0}
+    0x02c2 n=20 uniq=5
+        ONLY-OFF  31 00 00 00 00 00 00 00  {'OFF': 5, 'ON': 0}
+    0x0419 n=38 uniq=8
+        ONLY-ON  79 90 25 D6 85 7A 84 00  {'OFF': 0, 'ON': 6}
+        ONLY-OFF  FE 40 29 D6 81 7A 84 00  {'OFF': 6, 'ON': 0}
+    0x0445 n=26 uniq=3
+        ONLY-ON  67 40 00 00 00 00 00 18  {'OFF': 0, 'ON': 7}

@@ -1,0 +1,5 @@
+Bus,MessageID,Message,MessageLength,Time
+0,0x123,0x0102030405060708,8,0.001
+0,0x123,0x0102030405060709,8,0.002
+2,0x200,0xaabbccddeeff1122,8,0.003
+2,0x200,0xaabbccddeeff1122,8,0.004

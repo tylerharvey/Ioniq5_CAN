@@ -1,1 +1,10 @@
 *.ipynb
+
+# dsh scratch: local scratch/results, not source (see ~/.dsh/AGENTS.md)
+.artifacts/
+.tmp/
+
+# python build/test byproducts
+__pycache__/
+*.egg-info/
+.pytest_cache/

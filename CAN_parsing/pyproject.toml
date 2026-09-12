@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "can_parsing"
+version = "0.2.0"
+description = "CAN log parsing tools for the Ioniq 5 / E-GMP preconditioning analysis"
+requires-python = ">=3.9"
+dependencies = ["numpy>=2.0"]
+
+[project.optional-dependencies]
+dbc = ["cantools"]
+plot = ["matplotlib"]
+test = ["pytest"]
+
+[project.scripts]
+highlight-discrete-signals = "highlight_discrete_signals:main"
+
+[tool.setuptools]
+packages = ["canlib"]
+py-modules = ["highlight_discrete_signals", "condition_mode_analysis"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+# The full-corpus golden run takes about a minute; it is opt-in.
+addopts = "-m 'not slow'"
+markers = [
+    "slow: reproduces the golden output for every log in ../CAN_logs (deselect with -m 'not slow')",
+]
