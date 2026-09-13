@@ -6,9 +6,12 @@ decode them against a DBC, and name individual bits in frames that have no DBC
 entry yet.
 
 This is the notebook work (`parsing_*.ipynb`) extracted into a library and two
-command line tools. The notebooks themselves were **not** migrated and still
-import the removed `parsing_lib`; see [MIGRATION.md](MIGRATION.md) for the name
-map and the deliberate behaviour changes.
+command line tools. The rest of the notebooks were **not** migrated: they sit in
+`archived_notebooks/` and still import the removed `parsing_lib`. One has been
+ported back as a worked example — `parsing_utility_mode.ipynb`, the "utility
+mode" session — and reproduces its archived results cell for cell. See
+[MIGRATION.md](MIGRATION.md) for the name map and the deliberate behaviour
+changes, and `archived_notebooks/README.md` for why the rest are frozen.
 
 ## Install and run
 
@@ -51,6 +54,8 @@ not import cantools, so the core package stays numpy-only.
 | `highlight_discrete_signals.py` | the DBC signal + payload-state report |
 | `highlight_bits.py` | the bit-level CLI (`observed`, `invariant`) |
 | `condition_mode_analysis.py` | the one-off 0x0C7 conditioning-mode study |
+| `parsing_utility_mode.ipynb` | the "utility mode" reverse-engineering session, ported to `canlib` |
+| `archived_notebooks/` | the pre-refactor notebooks, kept for reference; they do not run |
 | `tests/` | pytest suite, fixtures, and the golden outputs |
 
 ## Quick start
