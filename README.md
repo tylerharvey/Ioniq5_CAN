@@ -1,13 +1,17 @@
 > Car, give me the grace to accept with serenity the things that cannot be changed, courage to build the buttons that Hyundai will never offer as an update, and the wisdom to distinguish the one from the other. 
 
 # Purpose 
-We have begun shipping a fully open-source Ioniq 5/6/EV6 preconditioning button that can be implemented with a hardware retrofit kit. With the kit, preconditioning is [activatable](https://youtu.be/37fBu63kVeo?si=eVobnYavg8i2hmdD) and cancelable by an [existing button](guides/manuals/preconditioning_manual.pdf) in your car. Other activation options are in development. For a brief background on battery preconditioning, see ["What is preconditioning?"](what_is_preconditioning.md). For a brief technical overview of the kit, see the [basic preconditioning kit explanation](basic_explanation.md). This repository serves to document progresss on Ioniq 5 CAN reverse-engineering and status updates on the hardware and software for the kit.
+We have begun shipping a fully open-source Ioniq 5/6/EV6 preconditioning button that can be implemented with a hardware retrofit kit. With the kit, preconditioning is [activatable](https://youtu.be/37fBu63kVeo?si=eVobnYavg8i2hmdD) and cancelable by an [existing button](guides/manuals/preconditioning_manual.pdf) in your car. Other activation options are in development; the latest [firmware](https://github.com/L1Z3/wicant-i-precondition) also adds a remote toggle in the WiCAN web interface. For a brief background on battery preconditioning, see ["What is preconditioning?"](what_is_preconditioning.md). For a brief technical overview of the kit, see the [basic preconditioning kit explanation](basic_explanation.md). This repository serves to document progresss on Ioniq 5 CAN reverse-engineering and status updates on the hardware and software for the kit.
 Major contributors to date:
 - [Liz](https://github.com/L1Z3): firmware, CAN reverse-engineering
 - [Roy](https://github.com/dragz): CAN reverse-engineering, prototyping
 - [Corbin](https://www.theioniqguy.com): testing, strategy, marketing, retail, 3D printing
 - [Tyler](https://github.com/tylerharvey): glue guy/productizing
 - [Michaël](https://github.com/Tichael): technical review, EV6 testing
+
+Firmware contributors:
+- [Eliot](https://github.com/eiiot)
+- [Adam](https://github.com/adman234)
 
 Other contributors:
 - people who have contributed to install guides are specifically noted in those guides      
@@ -18,6 +22,10 @@ Other repositories for this project:
 - [manual preconditioning firmware repository](https://github.com/L1Z3/wicant-i-precondition)
 - [known CAN messages in DBC format](https://github.com/dragz/egmpdbc)
 - [ESP-based DIY build](https://github.com/dragz/ironiq)
+
+> [!NOTE]
+> **Alternate option**
+> Gor has released his [head unit rooting kit](https://github.com/xwtk/hmg_nemesis). This approach can provide manual preconditioning, among other things--Gor has built an alpha prototype that will likely be released in beta soon but it is not present in the kit at the moment. This route is a bit more technical in nature (there is no factory reset if you delete something important from your head unit firmware), requires OTA update to be enabled on your car, and may be blocked by future updates as [past](https://g4933.gitlab.io/wideopen/) [root](https://github.com/cantcs/HKG_Gen5W_ReverseEngineer) [exploits](https://github.com/Helloyunho/gen5w-utils) have been. But this method is completely free and can provide manual preconditioning completely within your head unit.
 
 # How to Buy
 We have begun shipping orders to customers. To purchase in the US, visit [ElectroniqButtons.com](https://www.electroniqbuttons.com). To purchase outside the US, buy on [Etsy](https://www.etsy.com/listing/4498059167/ioniq-56ev6gv60-manual-preconditioning). Etsy does not support HTML, so the product pages are much clearer at [ElectroniqButtons.com](https://www.electroniqbuttons.com). It's advisable to browse there first. If you have any questions not answered on the product pages, please ask us at [info@electroniqbuttons.com](mailto:info@electroniqbuttons.com). If you do make a purchase, please fill out [this email form](https://docs.google.com/forms/d/e/1FAIpQLSd8GtjELMu9Nn59Qep1Qt1Ey02MGxPplVcpOBm7KX2CQ7S9JQ/viewform?usp=header) so we know which car(s) you have.
@@ -30,7 +38,7 @@ This kit has a few moving parts:
 - wiring harnesss to adapt microcontroller to car (how to plug the box into the car)
 - user interface (the button that triggers preconditioning)
 
-The [CAN messages for preconditioning](preconditioning_messages/) have been documented since March 2026. We are shipping a first version of the microcontroller now, and you will have the option of a free trade-in or discounted purchase of the non-flickery customized WiCAN when it is available. The current firmware works well, and we are rapidly developing new features in firmware. The wiring harness has been extensively tested and is in bulk production, and may only slightly change in length to accommodate new installation methods. The current user interface allows for a choice of existing buttons on the car to trigger preconditioning, and we are working hard on physical buttons.
+The [CAN messages for preconditioning](preconditioning_messages/) have been documented since March 2026. We are shipping a first version of the microcontroller now, and you will have the option of a free trade-in or discounted purchase of the non-flickery customized WiCAN when it is available. (Current estimate: October.) The current firmware works well, and we are rapidly developing new features in firmware. The wiring harness has been extensively tested and is in bulk production, and may only slightly change in length to accommodate new installation methods. The current user interface allows for a choice of existing buttons on the car to trigger preconditioning, and we are working hard on physical buttons.
 
 Videos of the button in action:
 - [dragz triggering preconditioning from a laptop](https://youtu.be/vaBQV_6DW-M?si=8POdBs7m_WmN-vUu)
@@ -39,7 +47,7 @@ Videos of the button in action:
 - [demonstration of beta kit](https://youtu.be/37fBu63kVeo?si=eVobnYavg8i2hmdD)
 
 # Current Status
-Kits have shipped to about 40 people. Liz and Tyler have had the first prototype custom WiCAN installed in their cars for over a month, and [wicant-i-precondition](https://github.com/L1Z3/wicant-i-precondition) automatically supports both wiCANs in a single main branch. We will test the second prototype shortly. Shipping of the custom WiCANs will occur in the fall. We are rapidly releasing firmware updates, so if you've purchased the kit, check [releases](https://github.com/L1Z3/wicant-i-precondition/releases/) for the latest and follow [these instructions](https://meatpihq.github.io/wican-fw/config/firmware-update/) to update your WiCAN.
+Kits have shipped to about 40 people. Liz and Tyler have had the first prototype custom WiCAN installed in their cars for over a month, and [wicant-i-precondition](https://github.com/L1Z3/wicant-i-precondition) automatically supports both wiCANs in a single main branch. We are now testing the second prototype, which has one CAN-FD-capable interface. Shipping of the custom WiCANs will occur in the fall. We are rapidly releasing firmware updates, so if you've purchased the kit, check [releases](https://github.com/L1Z3/wicant-i-precondition/releases/) for the latest and follow [these instructions](https://meatpihq.github.io/wican-fw/config/firmware-update/) to update your WiCAN.
 
 We are shipping a [fork of WiCAN firmware lead by Liz](https://github.com/L1Z3/wicant-i-precondition) on stock WiCAN-OBD-C3s for the beta run. 
 
@@ -94,8 +102,8 @@ Written guides are available for:
 - [basic use of the kit](guides/manuals/preconditioning_manual.pdf)
 - [harness mode switching](guides/harnesses/head_unit_MITM/MITM_harness_modes.pdf)
 - [Ioniq 5 install](guides/cars/E-GMP_gen1/Ioniq5/head_unit_preconditioning_kit_Ioniq5_install.pdf)
-- [Ioniq 6 install](guides/cars/E-GMP_gen1/Ioniq5/head_unit_preconditioning_kit_Ioniq6_install.pdf)
-- [EV6 install](guides/cars/E-GMP_gen1/Ioniq5/head_unit_preconditioning_kit_EV6_install.pdf)
+- [Ioniq 6 install](guides/cars/E-GMP_gen1/Ioniq6/head_unit_preconditioning_kit_Ioniq6_install.pdf)
+- [EV6 install](guides/cars/E-GMP_gen1/EV6/head_unit_preconditioning_kit_EV6_install.pdf)
 
 # CAN Reverse Engineering Tips/Resources
 One or two good logs is far more valuable than 10 questionable logs. I had much better success after identifying my best logs and cleaning them (e.g. out-of-range timestamps from buffered data). Think of log acqusition as a scientific experiment: you want a test and a control condition. In the case of preconditioning, that meant setting the nav to a charger nearby vs. to a school nearby. You can also tag logs with known messages, such as the star button. If all else fails, plotting temporal changes in a large range of messages can offer a lot of insight and help identify interesting frame IDs.
