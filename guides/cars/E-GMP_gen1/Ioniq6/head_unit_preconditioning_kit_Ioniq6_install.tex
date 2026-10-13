@@ -185,6 +185,15 @@ Step-by-step instructions:
 \end{figure}
 
 \section{Step 5: Clean up} \label{sect:5}
-Reverse the trim removal steps. Make sure trim clips are aligned, and then firmly pop the trim panels back into place. Reconnect 12V battery negative terminal. The WiCAN should immediately show a blue light. Change your WiCAN password: \href{https://meatpihq.github.io/wican-fw/config/wifi}{https://meatpihq.github.io/wican-fw/config/wifi}. You can connect to your WiCAN directly by finding a WiFi network named 'WiCAN\_xxxxxxx' and going to \href{http://192.168.80.1/}{http://192.168.80.1/} in your browser.
+Reverse the trim removal steps. Make sure trim clips are aligned, and then firmly pop the trim panels back into place. Reconnect 12V battery negative terminal. The WiCAN should immediately show a blue light.
+
+\subsection{WiCAN setup}
+The WiCAN by default provides a WiFi access point. Look for a network named \texttt{WiCAN\_xxxxxxx}, where \texttt{xxxxxxx} is the device ID of your unit, and connect to it with the default password \texttt{@meatpi\#}. From a phone, the network can take a few seconds to appear, and your phone will warn you that it has no internet access; stay connected anyway. Then open \href{http://192.168.80.1}{http://192.168.80.1} in a browser to reach the configuration interface. (A WiCAN Pro, not officially supported, uses \href{http://192.168.0.10}{http://192.168.0.10} instead.)
+
+In the ``Settings'' tab, change the access point password. With the default password, anyone within WiFi range of your car who knows the default password could unlock your car (yes, this feature is coming!). If you leave the WiCAN in access point mode, we also suggest disabling BLE for now.
+
+Optionally, the WiCAN can be configured in station mode to join your home WiFi so that you can reach it from inside the house. In the ``Settings'' tab, set ``Mode'' to ``AP+Station'', enter your network's ``SSID'' and ``Password'', and press ``Submit changes''. The WiCAN keeps broadcasting its own access point, so you cannot lock yourself out this way. However, access point mode in ``AP+Station'' can be a bit finicky, so we recommend AP only unless you're using Home Assistant or similar to grab data from your car. The ``Status'' tab then shows the ``Station IP'' your router assigned, which is the address to use from your home network.
+
+The full WiCAN WiFi documentation is at \href{https://meatpihq.github.io/wican-fw/config/wifi}{https://meatpihq.github.io/wican-fw/config/wifi}.
 % \appendix 
 \end{document}

@@ -58,41 +58,61 @@ If you do not have this screen, you should not buy this kit. Please contact a de
 If instead of `Battery Conditioning Mode' as shown in Figure \ref{subfig:menus:batt_cond}, you have `Winter Mode', your car just needs a firmware update from a dealership. Find the relevant technical service bulletin for your country regarding this update and head to your nearest competent dealership. After completion of this step and confirmation of the `Battery Conditioning Mode' menu replacing `Winter Mode', you can buy this kit.
 
 \section{Basic Kit Setup}
-Start with the \href{https://github.com/tylerharvey/Ioniq5_CAN/tree/main/guides/}{installation guides}. See \href{https://meatpihq.github.io/wican-fw/config/wifi}{WiCAN docs} for basic WiCAN setup. This is not necessary to activate preconditioning, but it's highly recommended that you at least change the default WiFi password for security.  
+Start with the \href{https://github.com/tylerharvey/Ioniq5_CAN/tree/main/guides/}{installation guides}
 
-\section{Firmware Update}
+\subsection{Which firmware?}
+Your kit shipped with either our first stable firmware, or our EB 0.1.0, or EB 0.1.13, depending on when it shipped. This manual describes the latest release. Check for a newer version and update it (section \ref{sect:firmware}) if you want the features described below.
+
+\section{Firmware Update} \label{sect:firmware}
 
 We are rapidly releasing firmware updates, so check \href{https://github.com/L1Z3/wicant-i-precondition/releases/}{https://github.com/L1Z3/wicant-i-precondition/releases/} for the latest and follow these instructions: \href{https://meatpihq.github.io/wican-fw/config/firmware-update/}{https://meatpihq.github.io/wican-fw/config/firmware-update/} to update your WiCAN.
+
+\subsection{Which binary is mine?}
+Every release publishes two builds, and you must use the one that matches your hardware:
+\begin{enumerate}
+  \item \texttt{wican-fw\_obd\_...bin} is for the stock WiCAN (``WiCAN original'', the WiCAN-OBD-C3). It uses an ESP32-C3 and has one CAN interface, which is all that parallel mode needs.
+  \item \texttt{wican-fw\_custom\_...bin} is for our customized WiCAN (the WiCAN-EB-S3). It uses an ESP32-S3 and has two CAN interfaces, and is capable of man-in-the-middle mode. The hardware is capable of CAN-FD, but firmware support isn't released yet.
+\end{enumerate}
+The release notes label these two assets ``WiCAN original'' and ``custom WiCAN''. Flashing will error out if you try to flash the wrong one, and you can try again. Beta kits ship with a stock WiCAN and therefore take the \texttt{\_obd\_} build.
+
+\subsection{Before you update}
+Two cautions that come with the release instructions:
+\begin{enumerate}
+  \item If MQTT is enabled, disable it before uploading the firmware.
+  \item An update may reset your device configuration. Save a backup first with ``System $\to$ Download Configuration'', so that you can restore your button mapping and modes afterwards.
+\end{enumerate}
 
 \section{User Interface}
 We are rapidly developing the user interface, so check back here often! This documentation describes the latest beta interface. If there are features here not available on your WiCAN and you want them, update it!
 
 To configure the manual preconditioning behavior, connect to the WiCAN WiFi and visit the WiCAN configuration page at \href{http://192.168.80.1}{http://192.168.80.1}. The third tab, called ``Buttons'', shown in Figure \ref{subfig:ui:buttons} allows for configuration of the manual preconditioning button and any other custom buttons that are added later.
 
-\begin{figure}[h]
+\begin{figure}[htbp]
   \subfloat[]{\label{subfig:ui:buttons}
-  \includegraphics[height=1.95in]{photos/ui_2026-08-27.png} }  \\
+  \includegraphics[width=0.95\linewidth]{photos/ui_2026-10-13.png} }  \\
    \caption{Screenshot of ``Buttons'' page in WiCAN http configuration.}
 \end{figure}
 
-The first option, ``Preconditioning Mode'', selects how long preconditioning continues once triggered:
+The first option, ``Select Vehicle'', tells the WiCAN which car it is in. It defaults to ``Auto (not detected yet)'' and changes itself once the WiCAN has seen enough CAN traffic to identify the car; you can also set it by hand to ``Ioniq 5'', ``EV6'' or ``Ioniq 6''. This setting only changes how the activation button list below is filtered, not how preconditioning behaves, so set it by hand if the automatic detection has not recognized your car.
+
+The second option, ``Preconditioning Mode'', selects how preconditioning is managed after it is requested:
 \begin{enumerate}
   \item ``Once'' (default): after triggering a single preconditioning cycle, preconditioning will stop.
   \item ``Continuous'': the BMS will automatically re-heat the battery if the temperature drops again, until the car is powered off.
   \item ``Persistent'': like ``Continuous'', but the WiCAN remembers that preconditioning is enabled even through car on-off cycles, so it will automatically re-activate whenever you start the car.
 \end{enumerate}
 
-The second option allows you a choice of button to map preconditioning onto. By default, 6 options are displayed:
+The third option, ``Preconditioning Activation Button'', lets you choose which button triggers preconditioning. The list is filtered down to the buttons that exist on the selected car:
 \begin{enumerate}
   \item Disabled
   \item Star Button (Steering Wheel) -- Default
-  \item Star Button (Climate Bar)
-  \item Tuner Press (Climate Bar)
-  \item Volume Press (Climate Bar)
+  \item Star Button (Ioniq 5/6 Climate Bar)
+  \item Tuner Press (Ioniq 5/6 Climate Bar)
+  \item Volume Press (Ioniq 5/6 Climate Bar)
   \item Setup (EV6 Climate Bar)
 \end{enumerate}
-The ``Setup'' button is only present on EV6 climate bars. More options are available with the customized WiCAN in man-in-the-middle mode.
-With ``Disabled'', no button will trigger preconditioning. This may be desirable when taking your car into a dealership for service to avoid confusing dealership service technicians. The ``press'' options refer to pressing in those buttons, as opposed to turning or pushing up or down. If none of these options work, you can check the ``Show all button options'' checkbox to enable more options:
+More options are available with the customized WiCAN in man-in-the-middle mode.
+With ``Disabled'', no button will trigger preconditioning. This may be desirable when taking your car into a dealership for service to avoid confusing dealership service technicians. The ``press'' options refer to pressing in those buttons, as opposed to turning or pushing up or down. If none of these options work, you can check the ``Show extra button options'' checkbox to enable the less common buttons, and ``Show buttons for all vehicles'' to ignore the car filter. If the button you have selected is not one that exists on the car the WiCAN thinks it is in, a warning appears below the list; the firmware does not check this for you, and such a button will simply never trigger preconditioning. The additional options are:
 \begin{tasks}(2)
   \task Mode (Steering Wheel)
   \task Speak (Steering Wheel)
@@ -102,28 +122,34 @@ With ``Disabled'', no button will trigger preconditioning. This may be desirable
   \task Volume Down (Steering Wheel)
   \task Skip Up (Steering Wheel)
   \task Skip Down (Steering Wheel)
-  \task OK (Steering Wheel)
-  \task Map (Climate Bar)
-  \task Nav (Climate Bar)
-  \task Media (Climate Bar)
-  \task Tuner Up (Climate Bar)
-  \task Tuner Down (Climate Bar)
+  \task OK (Ioniq 5/EV6 Steering Wheel)
+  \task Map (Ioniq 5/6 Climate Bar)
+  \task Nav (Ioniq 5/6 Climate Bar)
+  \task Media (Ioniq 5/6 Climate Bar)
+  \task Tuner Up (Ioniq 5/6 Climate Bar)
+  \task Tuner Down (Ioniq 5/6 Climate Bar)
 \end{tasks}
 Pick the button that works for you! We hope to offer physical buttons soon.
 
-The third option, ``Preconditioning Press Type'', lets you choose whether the activation button triggers on a short press or a long press. With ``Short Press'', preconditioning triggers when you press and release the button within one second. With ``Long Press (hold 1s)'', you need to hold the button for at least one second; this can help avoid accidental triggering while driving.
+The fourth option, ``Preconditioning Press Type'', lets you choose whether the activation button triggers on a short press or a long press. With ``Short Press'', preconditioning triggers when you press and release the button within one second. With ``Long Press (hold 1s)'', you need to hold the button for at least one second; this can help avoid accidental triggering while driving.
 
-The fourth option, ``CAN Connection Mode'', is only shown when the WiCAN is connected to two CAN busses (the customized WiCAN in man-in-the-middle mode). With ``MITM (forward between buses)'', frames are forwarded between the two busses so the head unit and the rest of the car keep working normally, and preconditioning requests can be intercepted. With ``Parallel (no forwarding)'', no frames are forwarded. See the \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/harnesses/head_unit_MITM/MITM_harness_modes.pdf}{harness modes guide} for more detail on MITM vs.\ parallel.
+The fifth option, ``Toggle Preconditioning Remotely'', is a button that starts or stops preconditioning from this web page, so you do not have to reach for anything in the car. Its label switches between starting and stopping preconditioning, and the ``Status'' readings refresh shortly after you press it. You have to be connected to the WiCAN to use it, and, outside ``Persistent'' mode, preconditioning still ends when the car is powered off.
 
-The first tab, ``Status'', shown in Figure \ref{subfig:ui:status}, shows the current high-voltage battery temperature (minimum and maximum across the battery), which is a convenient way to check whether preconditioning conditions are met (see below).
+The sixth option, ``Track Popup Text'', sets the text that the WiCAN sends to the driver's display when it emulates the track-selection popup, and the ``Show Popup'' button beside it displays that text in the car immediately as a test. This allows other people in your household to get your attention if you're sitting in your car playing with it. The field is limited to 50 characters. 
 
-\begin{figure}[h]
+The seventh option, ``CAN Connection Mode'', is only shown when the WiCAN is connected to two CAN busses (the customized WiCAN in man-in-the-middle mode). With ``MITM (forward between buses)'', frames are forwarded between the two busses so the head unit and the rest of the car keep working normally, and preconditioning requests can be intercepted. With ``Parallel (no forwarding)'', no frames are forwarded. See the \href{https://github.com/tylerharvey/Ioniq5_CAN/blob/main/guides/harnesses/head_unit_MITM/MITM_harness_modes.pdf}{harness modes guide} for more detail on MITM vs.\ parallel.
+
+The first tab, ``Status'', shown in Figure \ref{subfig:ui:status}, is a read-only view of what the WiCAN can currently see. It reports the high-voltage battery temperature (minimum and maximum across the battery), which is a convenient way to check whether the conditions for preconditioning are met (see below), together with the battery state of charge, the battery voltage, and whether the car is powered on. ``Preconditioning Requested'' and ``Preconditioning Active'' report the state of the preconditioning session, and the ``Check status'' button refreshes the readings. The temperature can be shown in either $^\circ$C or $^\circ$F with the selector beside it; the same choice is used for the messages the WiCAN displays in the car.
+
+\begin{figure}[htbp]
   \subfloat[]{\label{subfig:ui:status}
-  \includegraphics[height=1.95in]{photos/ui_status_2026-08-27.png} }  \\
-   \caption{Screenshot of the ``Status'' page in WiCAN http configuration, including the high-voltage battery temperature readout.}
+  \includegraphics[height=0.75\textheight]{photos/ui_status_2026-10-13.png} }  \\
+   \caption{Screenshot of the ``Status'' page in WiCAN http configuration, including the high-voltage battery state of charge and temperature readouts and the preconditioning status. The status fields populate once the WiCAN begins talking to your car.}
 \end{figure}
 
 To activate preconditioning manually, just press the activation button you've chosen. You should immediately see a countdown in meters/yards on your cluster that hijacks the distance-to-destination indicator. If you have cruise control on, it blocks the most obvious display of the distance-to-destination indicator. Use the pages button on the steering wheel to navigate to the cluster page that shows navigation instructions. Preconditioning starts when this countdown reaches zero. If the countdown resets, that means something unexpected happened and it's retrying. 
+
+The WiCAN also reports what it is doing as text messages on the cluster, accompanied by a short beep. If preconditioning cannot start, the message says which of the conditions below blocked it, quoting both the value it read and the limit it has to beat. In ``Continuous'' or ``Persistent'' mode it likewise tells you when it is waiting for the state of charge to recover or when it is holding the battery at temperature. If you shift the car into utility mode, preconditioning stops and says so.
 
 When preconditioning activates, you'll see the standard popup saying, `Battery preconditioning activated for optimal DC charging', shown in Figure \ref{subfig:precon:popup}. You'll also get a snowflake or red coil icon over the battery symbol in the lower lefthand corner of the cluster, shown in Figure \ref{subfig:precon:coil}.
 
@@ -135,13 +161,14 @@ When preconditioning activates, you'll see the standard popup saying, `Battery p
    \caption{(a) Screenshot of the pop-up indicating successful activation of battery preconditioning. (b) Example screenshot of the coil icon overlaid on the battery symbol in the lower left corner of the instrument cluster. \label{fig:precon}}
 \end{figure}
 
-If preconditioning never activates, confirm that built-in conditions for activation are met:
+If preconditioning never activates, confirm that the built-in conditions for activation are met:
 \begin{enumerate}
   \item Battery temperature must be less than $\unit[21]{C}$/$\unit[70]{F}$
   \item State of charge must be higher than $\unit[20]{\%}$
   \item `Battery Conditioning Mode' screen is present in `EV Settings' menu (see section \ref{sect:eligibility})
+  \item The car must not be in utility mode
 \end{enumerate}
-Unfortunately, these are limits that are built into battery management unit firmware or the hardware of the car that we cannot change with this kit.
+Unfortunately, these are limits that are built into battery management unit firmware or the hardware of the car that we cannot change with this kit. The WiCAN names the condition that blocked the start in the message it displays on the cluster, so you do not have to guess which one it was.
 
 \section{Power Usage}
 This kit runs on your car's 12V bus, which means it can draw from your car's 12V battery. It's worth discussing a few points related to this:
@@ -189,7 +216,13 @@ We measured power draw with car off (12.7V) for several microcontrollers in seve
 
 \subsection{Will it kill the 12V?}
 
-The WiCAN has a power saving mode available, called sleep mode, where almost everything shuts down and it draws very little power. This is normally configured to start based on your car's 12V voltage. If you are concerned about your 12V, we encourage you to enable this feature, which can be found in the WiCAN interface at \href{http://192.168.80.1}{http://192.168.80.1} in the tab `Power Saving'. See more documentation here: \href{https://meatpihq.github.io/wican-fw/config/sleep-mode}{https://meatpihq.github.io/wican-fw/config/sleep-mode}. We are actively working on improving this feature to be CAN-based (i.e. listen for car-off signal) rather than voltage-based. 
+The WiCAN has a power saving mode available, called sleep mode, where almost everything shuts down and it draws very little power. If you are concerned about your 12V, we encourage you to enable this feature, which can be found in the WiCAN interface at \href{http://192.168.80.1}{http://192.168.80.1} in the tab `Power Saving'. ``Sleep Mode'' offers three choices:
+\begin{enumerate}
+  \item ``Low-Voltage Sleep'': the WiCAN sleeps once the 12V battery falls below the ``Sleep Voltage'' threshold, and wakes when the voltage rises above it again.
+  \item ``Car Power-Aware Sleep'': the same voltage threshold, but the WiCAN will not sleep while the car looks like it is on, and wakes as soon as it does. How the WiCAN can tell that the car is on depends on your hardware: only the customized WiCAN has a car-on sense pin; otherwise the WiCAN relies on seeing the car's power-status message on CAN. If neither signal reaches it, this mode behaves like low-voltage sleep. Note also that the WiCAN disables its CAN buses while asleep, so it can no longer see the car wake up; in that state it falls back to waking on the battery voltage crossing the threshold.
+  \item ``Disable'': no sleep at all.
+\end{enumerate}
+``Sleep After'' sets how long the condition must hold before the WiCAN actually sleeps. See more documentation here: \href{https://meatpihq.github.io/wican-fw/config/sleep-mode}{https://meatpihq.github.io/wican-fw/config/sleep-mode}.
 
 Over 7 days with a fresh 60Ah 12V battery, the customized WiCAN's typical power usage, 40 mA, would consume $40 \unit[\mathrm{mA}] * 24 \unit[\mathrm{hours/day}] * 7 \unit[\mathrm{days}] = 6.7 Ah$, which is about 10\% of the 12V state of charge. Unlocked and off, a 2022 Canadian Preferred AWD Ioniq 5 with no aftermarket loads draws about 1.75 A (1750 mA). After ECUs quiet down 5 minutes after locking the car, the draw is still 0.75 A (750 mA). (The car has a further "sleep" mode after 7 days of inactivity; this draw hasn't been measured here.) So, a customized WiCAN in MITM mode and not in sleep mode increases draw over the first 7 days of inactivity by 5\%.
 
