@@ -6,12 +6,19 @@ Major contributors to date:
 - [Liz](https://github.com/L1Z3): firmware, CAN reverse-engineering
 - [Roy](https://github.com/dragz): CAN reverse-engineering, prototyping
 - [Corbin](https://www.theioniqguy.com): testing, strategy, marketing, retail, 3D printing
-- [Tyler](https://github.com/tylerharvey): glue guy/productizing
+- [Tyler](https://github.com/tylerharvey): coordination, wiring harnesses, firmware, CAN reverse-engineering
+- [Suave](https://github.com/SuperSuave): CAN reverse-engineering, design ideas, EV6 testing
+- [Jacob](https://github.com/JacobPantuso): [app](https://jacobpantuso.ca/myIONIQ/), CAN reverse-engineering
 - [Michaël](https://github.com/Tichael): technical review, EV6 testing
+- Fae: GV60 testing, technical review
 
 Firmware contributors:
 - [Eliot](https://github.com/eiiot)
 - [Adam](https://github.com/adman234)
+
+Translation contributors:
+- Jargendas (German)
+- Dborn (French)
 
 Other contributors:
 - people who have contributed to install guides are specifically noted in those guides      
@@ -25,7 +32,7 @@ Other repositories for this project:
 
 > [!NOTE]
 > **Alternate option**
-> Gor has released his [head unit rooting kit](https://github.com/xwtk/hmg_nemesis). This approach can provide manual preconditioning, among other things--Gor has built an alpha prototype that will likely be released in beta soon but it is not present in the kit at the moment. This route is a bit more technical in nature (there is no factory reset if you delete something important from your head unit firmware), requires OTA update to be enabled on your car, and may be blocked by future updates as [past](https://g4933.gitlab.io/wideopen/) [root](https://github.com/cantcs/HKG_Gen5W_ReverseEngineer) [exploits](https://github.com/Helloyunho/gen5w-utils) have been. But this method is completely free and can provide manual preconditioning completely within your head unit.
+> Gor has released his [head unit rooting kit](https://github.com/xwtk/hmg_nemesis). This approach can provide manual preconditioning, among other things--Gor has built an alpha prototype that will likely be released in beta soon; another person built a [prototype](github.com/paytondevs/ioniq5-preconditioning) that is availalbe to use. This route is a bit more technical in nature (there is no factory reset if you delete something important from your head unit firmware), requires OTA update to be enabled on your car, and may be blocked by future updates as [past](https://g4933.gitlab.io/wideopen/) [root](https://github.com/cantcs/HKG_Gen5W_ReverseEngineer) [exploits](https://github.com/Helloyunho/gen5w-utils) have been. But this method is completely free and can provide manual preconditioning completely within your head unit.
 
 # How to Buy
 We have begun shipping orders to customers. To purchase in the US, visit [ElectroniqButtons.com](https://www.electroniqbuttons.com). To purchase outside the US, buy on [Etsy](https://www.etsy.com/listing/4498059167/ioniq-56ev6gv60-manual-preconditioning). Etsy does not support HTML, so the product pages are much clearer at [ElectroniqButtons.com](https://www.electroniqbuttons.com). It's advisable to browse there first. If you have any questions not answered on the product pages, please ask us at [info@electroniqbuttons.com](mailto:info@electroniqbuttons.com). If you do make a purchase, please fill out [this email form](https://docs.google.com/forms/d/e/1FAIpQLSd8GtjELMu9Nn59Qep1Qt1Ey02MGxPplVcpOBm7KX2CQ7S9JQ/viewform?usp=header) so we know which car(s) you have.
@@ -38,16 +45,17 @@ This kit has a few moving parts:
 - wiring harnesss to adapt microcontroller to car (how to plug the box into the car)
 - user interface (the button that triggers preconditioning)
 
-The [CAN messages for preconditioning](preconditioning_messages/) have been documented since March 2026. We are shipping a first version of the microcontroller now, and you will have the option of a free trade-in or discounted purchase of the non-flickery customized WiCAN when it is available. (Current estimate: October.) The current firmware works well, and we are rapidly developing new features in firmware. The wiring harness has been extensively tested and is in bulk production, and may only slightly change in length to accommodate new installation methods. The current user interface allows for a choice of existing buttons on the car to trigger preconditioning, and we are working hard on physical buttons.
+The [CAN messages for preconditioning](preconditioning_messages/) have been documented since March 2026. We are shipping a first version of the microcontroller now, and you will have the option of a free trade-in or discounted purchase of the WICAN-EB-S3 when it is available. (Current estimate: October.) The current firmware works well, and we are rapidly developing new features in firmware. The wiring harness has been extensively tested and is in bulk production, and may only slightly change in length to accommodate new installation methods. The current user interface allows for a choice of existing buttons on the car to trigger preconditioning, and we are working hard on physical buttons.
 
-Videos of the button in action:
+Videos showing off preconditioning buttons:
+- [demonstration of beta kit](https://youtu.be/37fBu63kVeo?si=eVobnYavg8i2hmdD)
+- [dablet showing a custom physical button integration](https://youtu.be/OSWiRef_yMw?si=BrhY2O2_SH0UrUyH)
 - [dragz triggering preconditioning from a laptop](https://youtu.be/vaBQV_6DW-M?si=8POdBs7m_WmN-vUu)
 - [triggering preconditioning with star button on a panda](https://youtu.be/1I849mg2cQ4?si=igR4gxgVAqW1klbn)
 - [Liz showing first UI](https://youtu.be/VzLoRYCNTqQ?si=Sd3lELZRXEixEHiz)
-- [demonstration of beta kit](https://youtu.be/37fBu63kVeo?si=eVobnYavg8i2hmdD)
 
 # Current Status
-Kits have shipped to about 40 people. Liz and Tyler have had the first prototype custom WiCAN installed in their cars for over a month, and [wicant-i-precondition](https://github.com/L1Z3/wicant-i-precondition) automatically supports both wiCANs in a single main branch. We are now testing the second prototype, which has one CAN-FD-capable interface. Shipping of the custom WiCANs will occur in the fall. We are rapidly releasing firmware updates, so if you've purchased the kit, check [releases](https://github.com/L1Z3/wicant-i-precondition/releases/) for the latest and follow [these instructions](https://meatpihq.github.io/wican-fw/config/firmware-update/) to update your WiCAN.
+Kits have shipped to about 40 people. Liz and Tyler have had the first prototype WiCAN-EB-S3 installed in their cars for months, and [wicant-i-precondition](https://github.com/L1Z3/wicant-i-precondition) automatically supports both wiCANs in a single main branch. We have accepted the second prototype WiCAN-EB-S3, which has one CAN-FD-capable interface. Shipping of the WiCAN-EB-S3s will occur in the fall. We are rapidly releasing firmware updates, so if you've purchased the kit, check [releases](https://github.com/L1Z3/wicant-i-precondition/releases/) for the latest and follow [these instructions](https://meatpihq.github.io/wican-fw/config/firmware-update/) to update your WiCAN.
 
 We are shipping a [fork of WiCAN firmware lead by Liz](https://github.com/L1Z3/wicant-i-precondition) on stock WiCAN-OBD-C3s for the beta run. 
 
