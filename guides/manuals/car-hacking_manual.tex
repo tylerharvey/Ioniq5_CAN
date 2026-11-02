@@ -8,6 +8,8 @@
 \usepackage{array}
 \usepackage[loose]{units}
 \usepackage{hyperref}
+\urlstyle{same}% typeset \url/\nolinkurl in the surrounding font
+\makeatletter\def\UrlBreaks{\do\/\do\-\do\_\do\.\do\?\do\=\do\&}\makeatother% allow breaks inside long URLs
 \usepackage{cleveref}
 \usepackage{tasks}
 \usepackage[caption=false]{subfig}
@@ -44,20 +46,21 @@
 
 
 \section{Which cars can use this?} \label{sect:eligibility}
-The kit is designed to work on most E-GMP cars. The ICU-H harness is designed for use with 2021-2024 Ioniq 5s and EV6s. The CCU harness is designed for 2023-2025 Ioniq 6s and GV60s, 2024-2027 EV9s, 2025-2027 Ioniq 5s and EV6s, 2026-2027 Ioniq 9s, and 2024-2026 Kona and Niro EVs. Other models or model refreshes that launched in 2022 or later are likely compatible, so please \href{mailto:requests@electroniqbuttons.com}{reach out} if you're interested and we'll check compatibility. 
+The kit is designed to work on most E-GMP cars. The ICU-H harness is designed for use with 2021-2024 Ioniq 5s and EV6s. The CCU harness is designed for 2023-2025 Ioniq 6s and GV60s, 2024-2027 EV9s, 2025-2027 Ioniq 5s and EV6s, 2026-2027 Ioniq 9s, and 2024-2026 Kona and Niro EVs. Other models or model refreshes that launched in 2022 or later are likely compatible, so please \href{mailto:requests@electroniqbuttons.com}{reach out} (\href{mailto:requests@electroniqbuttons.com}{requests@electroniqbuttons.com}) if you're interested and we'll check compatibility. 
 
 \section{Basic Kit Setup}
-Start with the \href{https://github.com/tylerharvey/Ioniq5_CAN/tree/main/guides/}{installation guides}. See \href{https://meatpihq.github.io/wican-fw/config/wifi}{WiCAN docs} for basic WiCAN setup. This is not necessary to start reverse engineering, but highly recommended for security.
+Start with the \href{https://github.com/tylerharvey/Ioniq5_CAN/tree/main/guides/}{installation guides} (\href{https://github.com/tylerharvey/Ioniq5_CAN/tree/main/guides/}{\nolinkurl{https://github.com/tylerharvey/Ioniq5_CAN/tree/main/guides/}}). See \href{https://meatpihq.github.io/wican-fw/config/wifi}{WiCAN docs} (\href{https://meatpihq.github.io/wican-fw/config/wifi}{\nolinkurl{https://meatpihq.github.io/wican-fw/config/wifi}}) for basic WiCAN setup. This is not necessary to start reverse engineering, but highly recommended for security.
 
 \section{SavvyCAN}
-There are many ways to grab CAN logs with a WiCAN, but most people choose \href{https://www.savvycan.com/}{SavvyCAN} for ease of use and features. A minimal set of instructions is available \href{https://meatpihq.github.io/wican-fw/savvycan/usage}{here}. We hope to offer more soon.
+There are many ways to grab CAN logs with a WiCAN, but most people choose \href{https://www.savvycan.com/}{SavvyCAN} (\href{https://www.savvycan.com/}{\nolinkurl{https://www.savvycan.com/}}) for ease of use and features. A minimal set of instructions is available \href{https://meatpihq.github.io/wican-fw/savvycan/usage}{here} (\href{https://meatpihq.github.io/wican-fw/savvycan/usage}{\nolinkurl{https://meatpihq.github.io/wican-fw/savvycan/usage}}). We hope to offer more soon.
 
-A fork of SavvyCAN actively developed by members of this E-GMP car-hacking community, \href{https://github.com/SuperSuave/SavvyLens}{SavvyLens}, has features designed for our reverse-engineering context, such as signal bookmarking and a nicer signal viewer.
+A fork of SavvyCAN actively developed by members of this E-GMP car-hacking community, \href{https://github.com/SuperSuave/SavvyLens}{SavvyLens} (\href{https://github.com/SuperSuave/SavvyLens}{\nolinkurl{https://github.com/SuperSuave/SavvyLens}}), has features designed for our reverse-engineering context, such as signal bookmarking and a nicer signal viewer.
 
 \section{Resetting your car}
 
 Sending CAN frames to your car when attempting to reverse engineer can put ECUs in strange states. We've seen issues with the climate bar and brightness adjustment when trying to reverse engineer those ECUs. If your car is acting strangely, disconnect the 12V for 30 minutes to do a hard reset. Note: you will lose BMS data, so please save that before doing this.
 
+\enlargethispage{3\baselineskip}
 \section{Frequently Asked Questions}
 \begin{enumerate}
   \item[Q:] Why am I not seeing any CAN data?

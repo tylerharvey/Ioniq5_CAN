@@ -1,9 +1,9 @@
 # Kia EV6 \- Head Unit Harness Installation Guide
 
-Written by [Tichael](https://github.com/Tichael) \- June 23, 2026
+Written by Tichael (https://github.com/Tichael) \- June 23, 2026
 
-Edited by [Tyler](https://github.com/tylerharvey) \- July 1, 2026
-Photos on quick method by Hotwirez/[jad3675](https://github.com/jad3675) and bowow/[discover dog](https://www.youtube.com/@Tsumeone) \- July 2, 2026
+Edited by Tyler (https://github.com/tylerharvey) \- July 1, 2026
+Photos on quick method by Hotwirez/jad3675 (https://github.com/jad3675) and bowow/discover dog (https://www.youtube.com/@Tsumeone) \- July 2, 2026
 
 # Introduction
 
