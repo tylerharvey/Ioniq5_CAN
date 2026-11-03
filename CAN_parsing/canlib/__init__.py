@@ -80,6 +80,7 @@ from .log import (
     load_log,
     sniff_format,
     timestamp_discontinuities,
+    synchronize_timestamps,
 )
 
 __all__ = [

@@ -126,6 +126,11 @@ are **not** in the DBC fall back to whole-payload granularity, where a limited
 number of distinct payloads is the same signal of interest. ISO-TP and VIN
 frames are excluded as protocol noise.
 
+Every reported frame id carries its bus: `[bus 1]` for a frame seen on one bus,
+`[bus 0,2]` for the DBC tier when the same id appears on several (it decodes
+them together). The muid tier is split per bus, so it prints one line per bus
+and a dual-bus log repeats a frame id once for each.
+
 ```
 ==============================================================================
 LOG: M-CAN_panda_nothing_on_remote_lock.csv
@@ -135,15 +140,15 @@ LOG: M-CAN_panda_nothing_on_remote_lock.csv
 
 DBC signal-level discrete changes (decoded via cantools):
 
-  * 0x151 BMS_10_100ms_1
+  * 0x151 [bus 0,130] BMS_10_100ms_1
       DATA  [8 distinct [...]; 7 change(s)]
           t=      0.04s  731835801130390344 -> 731835801130538237
           ...
 
 muid fallback frames (limited distinct payloads, not in DBC):
-  * 0x405  3 payload(s)  changes at: 0.1s, 0.2s
+  * 0x405 [bus 0]  3 payload(s)  changes at: 0.1s, 0.2s
   ...
-  * 0x4F1  2 payload(s)  changes at: 0.1s
+  * 0x4F1 [bus 0]  2 payload(s)  changes at: 0.1s
 
   METADATA VERIFIED:
     [OK ] expected 0x405: found

@@ -40,6 +40,7 @@ __all__ = [
     "sniff_format",
     "load_log",
     "timestamp_discontinuities",
+    "synchronize_timestamps",
 ]
 
 SAVVYCAN = "savvycan"
@@ -176,6 +177,15 @@ def timestamp_discontinuities(log: CanLog) -> tuple[int, int]:
     mean = diffs.mean()
     jumps = int(np.count_nonzero(np.abs((diffs - mean) / mean) > 2)) if mean else 0
     return int(np.count_nonzero(diffs < 0)), jumps
+
+def synchronize_timestamps(log: CanLog) -> tuple[int,int]:
+    """
+    Ensure that logs from multiple WiCANs have a shared timestamp starting at 0
+    """
+    for bus in np.unique(log.bus):
+        bus_mask = np.nonzero(log.bus == bus)
+        log.timestamps[bus_mask] -= log.timestamps[bus_mask][0]
+    return 0
 
 
 def _header_columns(header: str) -> list[str]:

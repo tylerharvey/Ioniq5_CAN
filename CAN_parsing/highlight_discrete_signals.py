@@ -39,6 +39,7 @@ import glob
 import json
 import os
 import sys
+import numpy as np
 
 import canlib
 from canlib import dbc as dbc_lib
@@ -48,7 +49,7 @@ DEFAULT_DBC = os.path.expanduser('~/Packages/egmpdbc/ioniq5-2022.dbc')
 DEFAULT_LOGS = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                              '..', 'CAN_logs'))
 DEFAULT_DBCS = [os.path.join(os.path.dirname(DEFAULT_DBC), f)
-                for f in ('ioniq5-2022.dbc', 'ev6-2024.dbc', 'ioniq6-2023-2025.dbc')]
+                for f in ('ioniq5-2022.dbc', 'ev6-2024.dbc', 'ioniq6-2024.dbc')]
 
 
 # ---------------------------------------------------------------------------
@@ -96,7 +97,7 @@ def title_keywords(filename):
 # ---------------------------------------------------------------------------
 # Log loading
 # ---------------------------------------------------------------------------
-def load_log(path, clean=False):
+def load_log(path, clean=False, synchronize=True):
     """Load a log with canlib, optionally dropping the pre-reset fragment.
 
     `--clean-timestamps` is off by default because these logs restart their
@@ -104,7 +105,10 @@ def load_log(path, clean=False):
     event of interest was in that first segment.
     """
     log = canlib.load_log(path)
-    if not clean:
+    if not clean and not synchronize:
+        return log
+    elif synchronize:
+        canlib.synchronize_timestamps(log)
         return log
     drops, jumps = canlib.timestamp_discontinuities(log)
     print(f"Identified {drops} drops in timestamp and {jumps} total timestamp jumps.")
@@ -118,24 +122,40 @@ def load_log(path, clean=False):
 def analyze_log_muid_fallback(log, threshold, exclude_ids=()):
     """Frames with a limited set of distinct payloads that are not in the DBC."""
     fallback = []
-    for frame_id, n_unique in canlib.limited_unique_frames(log, threshold):
-        if frame_id in exclude_ids:
-            continue  # already reported at signal level
-        timestamps, payloads = canlib.frame_series(log, frame_id)
-        _, change_times, _, _ = canlib.value_transitions(
-            timestamps, canlib.pack_muids(payloads))
-        fallback.append({
-            'frame_id': int(frame_id),
-            'n_unique_payloads': int(n_unique),
-            'change_times_s': [float(t) for t in change_times],
-        })
+    for bus in np.unique(log.bus):
+        for frame_id, n_unique in canlib.limited_unique_frames(log, threshold, bus):
+            if frame_id in exclude_ids:
+                continue  # already reported at signal level
+            timestamps, payloads = canlib.frame_series(log, frame_id, bus)
+            _, change_times, _, _ = canlib.value_transitions(
+                timestamps, canlib.pack_muids(payloads))
+            fallback.append({
+                'frame_id': int(frame_id),
+                'bus': int(bus),
+                'n_unique_payloads': int(n_unique),
+                'change_times_s': [float(t) for t in change_times],
+            })
     return fallback
 
 
 # ---------------------------------------------------------------------------
 # Reporting + verification
 # ---------------------------------------------------------------------------
-def format_report(log_path, db_path, dbc_results, muid_results, title_hits):
+def frame_buses(log, frame_id):
+    """Buses on which `frame_id` appears, ascending.
+
+    The DBC tier decodes a frame across every bus it appears on, so its bus
+    label lists them all; the muid tier is already per-bus and lists one.
+    """
+    return [int(b) for b in np.unique(log.bus[log.ids == frame_id])]
+
+
+def bus_label(buses):
+    """``bus 1`` / ``bus 0,2``: the bus note printed beside a frame id."""
+    return 'bus ' + ','.join(str(b) for b in buses)
+
+
+def format_report(log, log_path, db_path, dbc_results, muid_results, title_hits):
     lines = []
     lines.append("=" * 78)
     lines.append(f"LOG: {os.path.basename(log_path)}")
@@ -147,7 +167,9 @@ def format_report(log_path, db_path, dbc_results, muid_results, title_hits):
     if dbc_results:
         lines.append("\nDBC signal-level discrete changes (decoded via cantools):")
         for res in dbc_results:
-            lines.append(f"\n  * 0x{res['frame_id']:03X} {res['frame_name']}")
+            lines.append(f"\n  * 0x{res['frame_id']:03X} "
+                         f"[{bus_label(frame_buses(log, res['frame_id']))}] "
+                         f"{res['frame_name']}")
             for sig in res['signals']:
                 lines.append(f"      {sig['signal']}  [{sig['n_distinct']} distinct "
                              f"{sig['values']}; {sig['n_changes']} change(s)]")
@@ -164,7 +186,8 @@ def format_report(log_path, db_path, dbc_results, muid_results, title_hits):
             times = ", ".join(f"{t:.1f}s" for t in fr['change_times_s'][:8])
             if len(fr['change_times_s']) > 8:
                 times += ", ..."
-            lines.append(f"  * 0x{fr['frame_id']:03X}  {fr['n_unique_payloads']} payload(s)  "
+            lines.append(f"  * 0x{fr['frame_id']:03X} [{bus_label([fr['bus']])}]  "
+                         f"{fr['n_unique_payloads']} payload(s)  "
                          f"changes at: {times}")
     else:
         lines.append("\n  (no muid-fallback frames)")
@@ -233,7 +256,8 @@ def plot_results(log, frame_ids):
             norm_vals += 1e-6
             norm_vals /= norm_vals.max()
             norm_vals *= 1+(0.05*frame_id/1000)
-            plt.plot(log.time_s[indices], norm_vals, label=f'frame {hex(frame_id)}',
+            plt.plot(log.time_s[indices], norm_vals,
+                     label=f'frame {hex(frame_id)} [{bus_label(frame_buses(log, frame_id))}]',
                      alpha=0.5, marker='.', linestyle=None)
         if i % 5 == 4:
             plt.xlabel('Timestamp (s)')
@@ -303,10 +327,16 @@ def analyze_log(log, path, db, args, db_label, excluded_ids):
     muid_results = analyze_log_muid_fallback(log, args.threshold, excluded_ids)
     checks, state = verify_log(path, dbc_results, muid_results)
 
-    print(format_report(path, db_label, dbc_results, muid_results, title_keywords(path)))
+    print(format_report(log, path, db_label, dbc_results, muid_results,
+                        title_keywords(path)))
     if checks:
         print_metadata(checks, state)
     print()
+
+    # The DBC tier decodes one frame across all of its buses, so record which
+    # buses that was; the muid tier already carries one bus per frame.
+    for res in dbc_results:
+        res['buses'] = frame_buses(log, res['frame_id'])
 
     metadata = [{'frame': c[0], 'ok': c[1], 'note': c[2]} for c in checks]
     summary = {
@@ -357,8 +387,9 @@ def main(argv=None):
         records.append(record)
 
         if args.plot:
-            plot_results(log, [r['frame_id'] for r in dbc_results]
-                              + [f['frame_id'] for f in muid_results])
+            # the muid tier has one entry per (frame, bus): plot each id once
+            plot_results(log, sorted({r['frame_id'] for r in dbc_results}
+                                     | {f['frame_id'] for f in muid_results}))
 
         if args.id:
             print_frame_series(log, int(args.id, 16))
