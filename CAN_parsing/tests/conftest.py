@@ -13,7 +13,7 @@ FIXTURES_DIR = TESTS_DIR / "fixtures"
 GOLDEN_DIR = TESTS_DIR / "golden"
 LOG_DIR = REPO_DIR / "CAN_logs"
 DBC_DIR = Path.home() / "Packages" / "egmpdbc"
-REAL_DBCS = ("ioniq5-2022.dbc", "ev6-2024.dbc", "ioniq6-2023-2025.dbc")
+REAL_DBCS = ("ioniq5-2022.dbc", "ev6-2024.dbc", "ioniq6-2024.dbc")
 
 
 def fixture_log(name: str) -> str:

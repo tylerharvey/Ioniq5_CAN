@@ -111,7 +111,7 @@ analogue of the whole-payload "control signal" search the notebooks do.
 
 | flag | meaning |
 |---|---|
-| `--dbc DBC` | DBC to decode with; repeatable. Defaults to the three E-GMP DBCs (`ioniq5-2022`, `ev6-2024`, `ioniq6-2023-2025`) merged first-wins |
+| `--dbc DBC` | DBC to decode with; repeatable. Defaults to the three E-GMP DBCs (`ioniq5-2022`, `ev6-2024`, `ioniq6-2024`) merged first-wins |
 | `--logs PATH...` | files or directories; directories are searched recursively for `*.csv`. Default `../CAN_logs` |
 | `--threshold N` | max distinct values for a signal to count as discrete (default 10) |
 | `--min-changes N` | min transitions before a signal is reported (default 1) |
