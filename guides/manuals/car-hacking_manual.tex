@@ -60,13 +60,13 @@ A fork of SavvyCAN actively developed by members of this E-GMP car-hacking commu
 
 Sending CAN frames to your car when attempting to reverse engineer can put ECUs in strange states. We've seen issues with the climate bar and brightness adjustment when trying to reverse engineer those ECUs. If your car is acting strangely, disconnect the 12V for 30 minutes to do a hard reset. Note: you will lose BMS data, so please save that before doing this.
 
-\enlargethispage{3\baselineskip}
+\vspace*{-2\baselineskip}
 \section{Frequently Asked Questions}
 \begin{enumerate}
   \item[Q:] Why am I not seeing any CAN data?
   \item[A:] There are a lot of reasons this can happen. It's possible to configure the WiCAN such that this will happen (e.g. a protocol other than `savvycan'), although default settings should work for you. Some busses are CAN-FD and you won't see anything on those with a CAN 2.0 WiCAN. If your car is off and locked for over 5 minutes, you won't see anything. Trouble with WiFi connectivity can also cause problems, so check to see if you still have a connected bus in SavvyCAN.
   \item[Q:] How do I get access to CAN-FD busses?
-  \item[A:] We plan to offer a WiCAN with CAN-FD soon. For now, if you're in a hurry, the Lilygo T-2CAN-FD and a male OBD connector from AliExpress are a cheap way in.
+  \item[A:] Our WiCAN-EB-FD-S3 has an FD-capable controller and transceiver on its second bus, but the firmware currently runs that bus as classical CAN, so it will not show you FD traffic yet. This functionality is coming shortly!
 \end{enumerate}
 % \begin{figure}[h]
 %   \subfloat[]{\label{subfig:overview:harness}

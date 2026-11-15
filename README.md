@@ -9,6 +9,7 @@ Major contributors to date:
 - [Tyler](https://github.com/tylerharvey): coordination, wiring harnesses, firmware, CAN reverse-engineering
 - [Suave](https://github.com/SuperSuave): CAN reverse-engineering, design ideas, EV6 testing
 - [Jacob](https://github.com/JacobPantuso): [app](https://jacobpantuso.ca/myIONIQ/), CAN reverse-engineering
+- [Johnsci](https://github.com/fsckyou2): firmware, CAN reverse-engineering, Ioniq 6 testing
 - [Michaël](https://github.com/Tichael): technical review, EV6 testing
 - Fae: GV60 testing, technical review
 
@@ -55,7 +56,9 @@ Videos showing off preconditioning buttons:
 - [Liz showing first UI](https://youtu.be/VzLoRYCNTqQ?si=Sd3lELZRXEixEHiz)
 
 # Current Status
-Kits have shipped to about 40 people. Liz and Tyler have had the first prototype WiCAN-EB-S3 installed in their cars for months, and [wicant-i-precondition](https://github.com/L1Z3/wicant-i-precondition) automatically supports both wiCANs in a single main branch. We have accepted the second prototype WiCAN-EB-S3, which has one CAN-FD-capable interface. Shipping of the WiCAN-EB-S3s will occur in the fall. We are rapidly releasing firmware updates, so if you've purchased the kit, check [releases](https://github.com/L1Z3/wicant-i-precondition/releases/) for the latest and follow [these instructions](https://meatpihq.github.io/wican-fw/config/firmware-update/) to update your WiCAN.
+We are now shipping the customized WiCAN, the WiCAN-EB-FD-S3. No further hardware changes are anticipated for the preconditioning kit. 
+
+Kits have shipped to about 100 people. Liz and Tyler have had the first prototype WiCAN-EB-S3 installed in their cars for months, and [wicant-i-precondition](https://github.com/L1Z3/wicant-i-precondition) automatically supports both wiCANs in a single main branch. We are rapidly releasing firmware updates, so if you've purchased the kit, check [releases](https://github.com/L1Z3/wicant-i-precondition/releases/) for the latest and follow [these instructions](https://meatpihq.github.io/wican-fw/config/firmware-update/) to update your WiCAN.
 
 We are shipping a [fork of WiCAN firmware lead by Liz](https://github.com/L1Z3/wicant-i-precondition) on stock WiCAN-OBD-C3s for the beta run. 
 

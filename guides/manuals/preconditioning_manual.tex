@@ -70,12 +70,12 @@ Your kit shipped with either our first stable firmware, or our EB 0.1.0, or EB 0
 We are rapidly releasing firmware updates, so check \href{https://github.com/L1Z3/wicant-i-precondition/releases/}{https://github.com/L1Z3/wicant-i-precondition/releases/} for the latest and follow these instructions: \href{https://meatpihq.github.io/wican-fw/config/firmware-update/}{https://meatpihq.github.io/wican-fw/config/firmware-update/} to update your WiCAN.
 
 \subsection{Which binary is mine?}
-Every release publishes two builds, and you must use the one that matches your hardware:
+Each release publishes the two production builds, and you must use the one that matches your hardware:
 \begin{enumerate}
   \item \texttt{wican-fw\_obd\_...bin} is for the stock WiCAN (``WiCAN original'', the WiCAN-OBD-C3). It uses an ESP32-C3 and has one CAN interface, which is all that parallel mode needs.
-  \item \texttt{wican-fw\_custom\_...bin} is for our customized WiCAN (the WiCAN-EB-S3). It uses an ESP32-S3 and has two CAN interfaces, and is capable of man-in-the-middle mode. The hardware is capable of CAN-FD, but firmware support isn't released yet.
+  \item \texttt{wican-fw\_eb-fd\_...bin} is for our customized WiCAN (the WiCAN-EB-S3). It uses an ESP32-S3 and has two CAN interfaces, and is capable of man-in-the-middle mode. It is also hardware-capable of CAN-FD, but firmware support for SavvyCAN recording of CAN-FD is coming shortly.
 \end{enumerate}
-The release notes label these two assets ``WiCAN original'' and ``custom WiCAN''. Flashing will error out if you try to flash the wrong one, and you can try again. Beta kits ship with a stock WiCAN and therefore take the \texttt{\_obd\_} build.
+The release notes label these two assets ``WiCAN original'' and ``custom WiCAN''. Flashing will error out if you try to flash the wrong one, and you can try again. Beta kits originally shipped with a stock WiCAN and therefore took the \texttt{\_obd\_} build. All kits shipped as of mid-November include the WiCAN-EB-FD-S3.
 
 \subsection{Before you update}
 Two cautions that come with the release instructions:
@@ -229,7 +229,13 @@ The WiCAN has a power saving mode available, called sleep mode, where almost eve
 Over 7 days with a fresh 60Ah 12V battery, the customized WiCAN's typical power usage, 40 mA, would consume $40 \unit[\mathrm{mA}] * 24 \unit[\mathrm{hours/day}] * 7 \unit[\mathrm{days}] = 6.7 Ah$, which is about 10\% of the 12V state of charge. Unlocked and off, a 2022 Canadian Preferred AWD Ioniq 5 with no aftermarket loads draws about 1.75 A (1750 mA). After ECUs quiet down 5 minutes after locking the car, the draw is still 0.75 A (750 mA). (The car has a further "sleep" mode after 7 days of inactivity; this draw hasn't been measured here.) So, a customized WiCAN in MITM mode and not in sleep mode increases draw over the first 7 days of inactivity by 5\%.
 
 \subsection{MITM vs. Parallel}
-If the preconditioning kit harness is in MITM mode and your WiCAN goes to sleep, Hyundai/Kia app requests will not go through. A longer-term feature on our task list is to add a partial sleep that will allow CAN forwarding but disable WiFi. If the harness is in MITM mode and you want to use Hyundai/Kia app requests, we recommend setting the sleep-mode voltage threshold low, such as 12.3V (well below the resting voltage of a healthy 12V battery), so that the WiCAN stays awake during normal operation. 
+Man-in-the-middle mode makes many features work better, but some people may prefer parallel mode. We'll discuss the upsides of both here.
+
+If the preconditioning kit harness is in MITM mode and your WiCAN goes to sleep, Hyundai/Kia app requests will not go through. A longer-term feature on our task list is to add a partial sleep that will allow CAN forwarding but disable WiFi. If the harness is in MITM mode and you want to use Hyundai/Kia app requests, we recommend leaving sleep disabled. This is the default configuration. If you don't use Hyundai/Kia app requests, we recommend enabling the "Car Power-Aware" sleep with the default voltage. 
+
+If you are concerned about your 12V battery {\it and} want to use Hyundai/Kia app requests, you can leave your harness in parallel mode and configure the custom WiCAN to use parallel mode (this option is on the "Buttons" tab).
+
+If for any reason you need to remove your WiCAN (e.g. taking your car into a dealership), putting your harness into parallel mode will restore normal functionality of your car. If the harness is in man-in-the-middle mode and the WiCAN is disconnected, the head unit has no communication with the rest of the car. You'll notice that the state of charge indicator is missing on the head unit. 
 
 \section{Frequently Asked Questions}
 \begin{enumerate}
