@@ -35,7 +35,7 @@
 \begin{document}
                             
 \begin{abstract}
-  This guide walks you through the steps needed to change the mode of your head unit man-in-the-middle (MITM) harness between MITM and parallel modes. This is a troubleshooting or advanced DIY step. See also the \href{https://youtu.be/sWzxWfUpCfs}{video guide} (\href{https://youtu.be/sWzxWfUpCfs}{\nolinkurl{https://youtu.be/sWzxWfUpCfs}}).
+  This guide walks you through the steps needed to change the mode of your head unit man-in-the-middle (MITM) harness between MITM and parallel modes. This is a troubleshooting or advanced DIY step. See also the \href{https://youtu.be/sWzxWfUpCfs}{video guides} (\href{https://youtu.be/sWzxWfUpCfs}{\nolinkurl{https://youtu.be/sWzxWfUpCfs}} \href{https://youtu.be/0awA8GUCbbg}{\nolinkurl{https://youtu.be/0awA8GUCbbg}} \href{https://youtu.be/suHXtM7m4-k}{\nolinkurl{https://youtu.be/suHXtM7m4-k}}).
 \end{abstract}
 \title{Head unit man-in-the-middle mode swap guide}
 \author{Electroniq Buttons Boutique}
@@ -89,5 +89,14 @@ To reverse the mode, just reverse these instructions!
   \includegraphics[height=0.95in]{photos/parallel.jpg} }
    \caption{(a-b) Female shunt cap: initial MITM mode. (c) Disconnecting female shunt. (d) Disconnecting female shunt cap. (e) Parallel mode. \label{fig:shunts}}
 \end{figure}
+
+\section{When to use MITM vs. Parallel}
+Man-in-the-middle mode makes many features work better, but some people may prefer parallel mode. We'll discuss the upsides of both here.
+
+If the preconditioning kit harness is in MITM mode and your WiCAN goes to sleep, Hyundai/Kia app requests will not go through. A longer-term feature on our task list is to add a partial sleep that will allow CAN forwarding but disable WiFi. If the harness is in MITM mode and you want to use Hyundai/Kia app requests, we recommend leaving sleep disabled. This is the default configuration. If you don't use Hyundai/Kia app requests, we recommend enabling the "Car Power-Aware" sleep with the default voltage. 
+
+If you are concerned about your 12V battery {\it and} want to use Hyundai/Kia app requests, you can leave your harness in parallel mode and configure the custom WiCAN to use parallel mode (this option is on the "Buttons" tab).
+
+If for any reason you need to remove your WiCAN (e.g. taking your car into a dealership), putting your harness into parallel mode will restore normal functionality of your car. If the harness is in man-in-the-middle mode and the WiCAN is disconnected, the head unit has no communication with the rest of the car. You'll notice that the state of charge indicator is missing on the head unit. 
 \appendix
 \end{document}
