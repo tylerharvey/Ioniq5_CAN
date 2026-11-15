@@ -1,0 +1,78 @@
+\documentclass[superscriptaddress,onecolumn,floatfix]{revtex4-2}
+
+\usepackage{graphicx}
+\usepackage{epsfig}
+\usepackage{color}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage[loose]{units}
+\usepackage{hyperref}
+\usepackage{cleveref}
+\usepackage{braket}
+% \usepackage[caption=false]{subfig}
+\usepackage{subcaption}
+\usepackage[english]{babel}
+\usepackage{letltxmacro}
+
+\LetLtxMacro{\ORIGselectlanguage}{\selectlanguage}
+\makeatletter
+\DeclareRobustCommand{\selectlanguage}[1]{%
+    \@ifundefined{alias@\string#1}
+      {\ORIGselectlanguage{#1}}
+      {\begingroup\edef\x{\endgroup
+         \noexpand\ORIGselectlanguage{\@nameuse{alias@#1}}}\x}%
+}
+\newcommand{\definelanguagealias}[2]{%
+  \@namedef{alias@#1}{#2}%
+}
+\makeatother
+
+\definelanguagealias{en}{english}
+
+
+\begin{document}
+                            
+\title{How to set up your new WiCAN}
+\author{Electroniq Buttons Boutique}
+\email{support@electroniqbuttons.com}
+\date{\today}
+
+\maketitle
+
+This document describes the steps needed to set up your new WiCAN-EB-FD-S3. The firmware defaults to man-in-the-middle mode, and we recommend this mode if you don't have strong preferences, so we'll go over how to switch your harness to man-in-the-middle mode. If you want to read about the differences, see that section of the preconditioning manual (QR code in Figure~\ref{subfig:qr:manual}).
+
+First, your harness is currently in parallel mode. In this mode, you can remove the WiCAN and everything works normally, but some features don't work as well, if at all. We recommend switching to man-in-the-middle mode. There is a written guide linked to from Figure~\ref{subfig:qr:modes}, and video guides linked to there. If you need or want to remove your WiCAN for any reason later, just switch your harness back to parallel mode. 
+
+Second, swap WiCANs. Brace the bracket to avoid ripping off tape, then remove the old WiCAN and put the new one in. If you're sending your old WiCAN back, insert it in the conductive plastic package (either the old one, or the one you just took the new WiCAN out of), then put that in the return package and put it in the mail. Note that USPS blue boxes only accept mail up to 1/2" thick and the WiCAN is just a bit thicker than that, so you'll have to take it to a post office, or put it in your mail box as outgoing mail if that's possible where you live. The label is already on the return package. 
+
+We will (still) be releasing lots of firmware updates, so we hope you'll join either our \href{https://docs.google.com/forms/d/e/1FAIpQLSd8GtjELMu9Nn59Qep1Qt1Ey02MGxPplVcpOBm7KX2CQ7S9JQ/viewform?usp=sharing&ouid=113251294956098361139}{email list} Figure~\ref{subfig:qr:email} or \href{https://fluxer.gg/8FV7gPtN}{Fluxer community} Figure~\ref{subfig:qr:fluxer} to receive notifications of updates. Check out our releases, Figure~\ref{subfig:qr:releases}, and the update guide, Figure~\ref{subfig:qr:update}.
+
+\begin{figure}[h]
+  \begin{subfigure}{0.3\textwidth}
+    \includegraphics[height=1.95in]{photos/harness_modes.png} 
+    \caption{Harness Modes \label{subfig:qr:modes}}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+    \includegraphics[height=1.95in]{photos/manual.png} 
+    \caption{Manual \label{subfig:qr:manual}}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+    \includegraphics[height=1.95in]{photos/email_list.png} 
+    \caption{Email List Signup \label{subfig:qr:email}}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+    \includegraphics[height=1.95in]{photos/fluxer.png} 
+    \caption{Fluxer Community Invite \label{subfig:qr:fluxer}}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+    \includegraphics[height=1.95in]{photos/releases.png} 
+    \caption{Firmware Releases \label{subfig:qr:releases}}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+    \includegraphics[height=1.95in]{photos/firmware_update.png} 
+    \caption{Firmware Update Guide \label{subfig:qr:update}}
+  \end{subfigure}
+\end{figure}
+
+\end{document}
