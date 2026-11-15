@@ -97,6 +97,8 @@ If the preconditioning kit harness is in MITM mode and your WiCAN goes to sleep,
 
 If you are concerned about your 12V battery {\it and} want to use Hyundai/Kia app requests, you can leave your harness in parallel mode and configure the custom WiCAN to use parallel mode (this option is on the "Buttons" tab).
 
-If for any reason you need to remove your WiCAN (e.g. taking your car into a dealership), putting your harness into parallel mode will restore normal functionality of your car. If the harness is in man-in-the-middle mode and the WiCAN is disconnected, the head unit has no communication with the rest of the car. You'll notice that the state of charge indicator is missing on the head unit. 
+If for any reason you need to remove your WiCAN (e.g. taking your car into a dealership), putting your harness into parallel mode will restore normal functionality of your car. If the harness is in man-in-the-middle mode and the WiCAN is disconnected or stops working, the head unit has no communication with the rest of the car: the backup camera and parking display (including rear cross-traffic alert) stop working, the state of charge indicator is missing on the head unit, and neither the built-in preconditioning nor our button will start preconditioning. Your car is still drivable, but switch the harness back to parallel mode until the WiCAN is working again. We have only ever seen this happen when testing experimental firmware features with severe bugs.
+
+Messages the kit puts on the dash are flickery in parallel mode because the WiCAN has to compete with the head unit for control of the bus. In man-in-the-middle mode the WiCAN is the only thing talking to each side, so the messages are stable. That is why the customized WiCAN defaults to man-in-the-middle mode.
 \appendix
 \end{document}

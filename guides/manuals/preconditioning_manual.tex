@@ -70,12 +70,13 @@ Your kit shipped with either our first stable firmware, or our EB 0.1.0, or EB 0
 We are rapidly releasing firmware updates, so check \href{https://github.com/L1Z3/wicant-i-precondition/releases/}{https://github.com/L1Z3/wicant-i-precondition/releases/} for the latest and follow these instructions: \href{https://meatpihq.github.io/wican-fw/config/firmware-update/}{https://meatpihq.github.io/wican-fw/config/firmware-update/} to update your WiCAN.
 
 \subsection{Which binary is mine?}
-Each release publishes the two production builds, and you must use the one that matches your hardware:
+The build you need depends on the board inside your kit:
 \begin{enumerate}
-  \item \texttt{wican-fw\_obd\_...bin} is for the stock WiCAN (``WiCAN original'', the WiCAN-OBD-C3). It uses an ESP32-C3 and has one CAN interface, which is all that parallel mode needs.
-  \item \texttt{wican-fw\_eb-fd\_...bin} is for our customized WiCAN (the WiCAN-EB-S3). It uses an ESP32-S3 and has two CAN interfaces, and is capable of man-in-the-middle mode. It is also hardware-capable of CAN-FD, but firmware support for SavvyCAN recording of CAN-FD is coming shortly.
+  \item \texttt{wican-fw\_obd\_...bin} is for the stock WiCAN (``WiCAN original'', the WiCAN-OBD-C3). It uses an ESP32-C3 and has one CAN interface, which is all that parallel mode needs. Beta kits originally shipped with this board and therefore take the \texttt{\_obd\_} build.
+  \item \texttt{wican-fw\_eb-fd\_...bin} is for the customized WiCAN-EB-FD-S3 that we ship now. It uses an ESP32-S3, and its second CAN interface is an MCP2518FD with an FD-capable transceiver, which is what lets it run in man-in-the-middle mode. The hardware is capable of CAN-FD; the firmware currently runs both interfaces as classical CAN, and CAN-FD support is still in development.
+  \item \texttt{wican-fw\_custom\_...bin} is for the first customized board, the WiCAN-EB-S3 prototype from the beta run. It is also an ESP32-S3, but its second interface is an MCP2515, which is classical CAN only. Releases up to EB 0.1.3 label its build this way; builds from the \texttt{eb-fd-clean-sent} branch call the same board \texttt{wican-fw\_proto\_...bin}.
 \end{enumerate}
-The release notes label these two assets ``WiCAN original'' and ``custom WiCAN''. Flashing will error out if you try to flash the wrong one, and you can try again. Beta kits originally shipped with a stock WiCAN and therefore took the \texttt{\_obd\_} build. All kits shipped as of mid-November include the WiCAN-EB-FD-S3.
+Flashing will error out if you try to flash the wrong one, and you can try again. All kits shipped as of mid-November include the WiCAN-EB-FD-S3. \textbf{No tagged release includes the \texttt{\_eb-fd\_} build yet}, so check the release notes for the first release that does.
 
 \subsection{Before you update}
 Two cautions that come with the release instructions:
@@ -258,11 +259,13 @@ If for any reason you need to remove your WiCAN (e.g. taking your car into a dea
   \item[Q:] Will this kill my ICCU?
   \item[A:] No.
   \item[Q:] Can I use the built-in navigation while using this kit?
-  \item[A:] With the beta version, this is not possible. This will be fixed with the customized WiCAN.
+  \item[A:] Not with a stock WiCAN in parallel mode: the kit has to fight the head unit for control of the bus. With the customized WiCAN in man-in-the-middle mode the head unit keeps working normally, so the built-in navigation still starts preconditioning and the kit just adds a button on top.
   \item[Q:] Will a navigation update affect my ability to use the kit?
   \item[A:] It's highly unlikely, as the kit doesn't depend on communication with the head unit. A battery management unit update could (for instance, the update that enabled preconditioning retroactively on early Ioniq 5s), but we believe those must be done by dealerships. However, we can't promise with 100\% certainty that a navigation update will not affect the functionality of the kit. In the off chance that this does happen, let us know and we will do our best to update logic to restore manual preconditioning functionality.
   \item[Q:] Why the countdown? Why can't you just start preconditioning immediately upon button press?
   \item[A:] The battery management unit (the ECU inside the battery that contains the BMS) has a built-in 60-second timeout after the initial preconditioning request. If the request stops before the 60-second timeout passes, preconditioning won't start. So we've tried to make this 60-second wait obvious and clear to the user.
+  \item[Q:] Can I still use the WiCAN as a normal OBD-II dongle?
+  \item[A:] Yes. In the WiCAN web interface, open Settings and change Protocol to \texttt{elm327} (or \texttt{AutoPID} for apps that request auto-PIDs), then save. The WiCAN then answers standard OBD-II requests. Set the protocol back to \texttt{savvycan} when you are done, or the preconditioning features will not work.
   \item[Q:] Will you build me a new button?
   \item[A:] Maybe! Email us at \href{mailto:requests@electroniqbuttons.com}{requests@electroniqbuttons.com} with your requests.
   \item[Q:] Your business is called `Electroniq Buttons Boutique'. Where are the physical buttons?

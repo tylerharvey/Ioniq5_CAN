@@ -46,7 +46,7 @@ This kit has a few moving parts:
 - wiring harnesss to adapt microcontroller to car (how to plug the box into the car)
 - user interface (the button that triggers preconditioning)
 
-The [CAN messages for preconditioning](preconditioning_messages/) have been documented since March 2026. We are shipping a first version of the microcontroller now, and you will have the option of a free trade-in or discounted purchase of the WICAN-EB-S3 when it is available. (Current estimate: October.) The current firmware works well, and we are rapidly developing new features in firmware. The wiring harness has been extensively tested and is in bulk production, and may only slightly change in length to accommodate new installation methods. The current user interface allows for a choice of existing buttons on the car to trigger preconditioning, and we are working hard on physical buttons.
+The [CAN messages for preconditioning](preconditioning_messages/) have been documented since March 2026. Beta kits shipped with a stock WiCAN-OBD-C3; kits now ship with the customized WiCAN-EB-FD-S3 (see [Current Status](#current-status)). The current firmware works well, and we are rapidly developing new features in firmware. The wiring harness has been extensively tested and is in bulk production, and may only slightly change in length to accommodate new installation methods. The current user interface allows for a choice of existing buttons on the car to trigger preconditioning, and we are working hard on physical buttons.
 
 Videos showing off preconditioning buttons:
 - [demonstration of beta kit](https://youtu.be/37fBu63kVeo?si=eVobnYavg8i2hmdD)
@@ -60,7 +60,7 @@ We are now shipping the customized WiCAN, the WiCAN-EB-FD-S3. No further hardwar
 
 Kits have shipped to about 100 people. Liz and Tyler have had the first prototype WiCAN-EB-S3 installed in their cars for months, and [wicant-i-precondition](https://github.com/L1Z3/wicant-i-precondition) automatically supports both wiCANs in a single main branch. We are rapidly releasing firmware updates, so if you've purchased the kit, check [releases](https://github.com/L1Z3/wicant-i-precondition/releases/) for the latest and follow [these instructions](https://meatpihq.github.io/wican-fw/config/firmware-update/) to update your WiCAN.
 
-We are shipping a [fork of WiCAN firmware lead by Liz](https://github.com/L1Z3/wicant-i-precondition) on stock WiCAN-OBD-C3s for the beta run. 
+We are shipping a [fork of WiCAN firmware lead by Liz](https://github.com/L1Z3/wicant-i-precondition) on a customized WiCAN, the WiCAN-EB-FD-S3. The beta kits used a stock WiCAN-OBD-C3.
 
 Roy is gathering known E-GMP CAN bus information in [DBC files](https://github.com/dragz/egmpdbc) and has [prototyped a UI](https://github.com/dragz/ironiq) based on a Lilygo T-Display S3.
 
@@ -69,8 +69,8 @@ Roy is gathering known E-GMP CAN bus information in [DBC files](https://github.c
    - The necessary CAN messages to initiate preconditioning on 2021-2024 E-GMP cars were isolated by Roy and I in early March 2026. 
 2. microcontroller: 
    - We are using a low-cost prepackaged microcontroller to piggyback on existing work and open-source code
-   - Beta test units will use a stock WiCAN-OBD-C3 initially, and receive a customized WiCAN (WiCAN-EB-S3) later
-   - The customized WiCAN has been designed and is in testing now
+   - Beta test units used a stock WiCAN-OBD-C3 initially, and later received a customized WiCAN (the WiCAN-EB-FD-S3 that ships now)
+   - The customized WiCAN now shipping
 3. firmware:
    - Liz and I (mostly Liz) have [working firmware](https://youtu.be/1I849mg2cQ4?si=igR4gxgVAqW1klbn) for one prototype microcontroller [here](https://github.com/tylerharvey/animatronic_panda)
    - Liz ported that logic to [WiCAN firmware](https://github.com/L1Z3/wicant-i-precondition)
