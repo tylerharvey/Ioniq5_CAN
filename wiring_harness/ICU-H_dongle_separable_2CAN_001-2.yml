@@ -93,7 +93,7 @@ connectors:
     subtype: female
     manufacturer: Sumitomo
     mpn: 6098-5267
-    pinlabels: [CAN2 (HIGH), NC, NC, CAN2 (LOW)]
+    pinlabels: [CAN3 (HIGH), NC, NC, CAN3 (LOW)]
     additional_components:
       - type: Crimp
         qty: 2
@@ -313,7 +313,7 @@ connections:
     - ==>
     - CAN_selector2: [1,4]
     - W3b_twisted: [1,2]
-    - OBD2: [6,14]
+    - OBD2: [13,12]
   -
     - ICU_H_5011_0137_2: [29, 30]
     - W2_G_twisted: [1,2]
